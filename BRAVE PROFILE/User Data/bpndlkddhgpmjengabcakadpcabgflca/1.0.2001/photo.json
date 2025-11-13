@@ -1,0 +1,101 @@
+{
+  "schemaVersion": 1,
+  "campaigns": [
+    {
+      "campaignId": "cc74a446-1ec1-43ac-a604-cee8e105345d",
+      "logo": {
+        "imageUrl": "0002dfb8-5e06-46b7-b433-8061239e1b57/8ceb2fcb-a44e-466f-891b-f035fca2b9c7.png",
+        "destinationUrl": "https://www.youtube.com/watch?v=hy1L97OA9OQ",
+        "alt": "Coinage - Best Dish Ever - Learn More",
+        "companyName": "Coinage"
+      },
+      "wallpapers": [
+        {
+          "imageUrl": "0002dfb8-5e06-46b7-b433-8061239e1b57/4ee2cc91-de63-4114-bccf-35966e5bd22d.jpg",
+          "creativeInstanceId": "1d329b0d-f67b-48ad-ac5d-ae15c241eea7",
+          "focalPoint": {
+            "x": 1280,
+            "y": 720
+          }
+        },
+        {
+          "imageUrl": "13017f86-2a00-4edc-8202-81a45fa750c8/11b2f1dc-3c05-4ab1-8f11-86b14d1a9602.jpg",
+          "creativeInstanceId": "6952c2d9-b6aa-45a5-9545-818af1dc293a",
+          "focalPoint": {
+            "x": 1551,
+            "y": 720
+          },
+          "logo": {
+            "imageUrl": "13017f86-2a00-4edc-8202-81a45fa750c8/5e6a6926-d8e7-4471-b913-691d56beec72.png",
+            "destinationUrl": "https://www.guanocoin.com/",
+            "alt": "Guano - Unlock reward! Secure your $BAT tokens in the BAT cave on solana and start earning $GUANO",
+            "companyName": "Guano"
+          }
+        },
+        {
+          "imageUrl": "98feb731-9535-42ff-a6c4-30faa7ab5136/40214b87-45c5-4133-a771-01a6c1daf6ab.jpg",
+          "creativeInstanceId": "e6b9c1ca-d49b-47cb-84e8-60344afe4719",
+          "focalPoint": {
+            "x": 1280,
+            "y": 720
+          },
+          "logo": {
+            "imageUrl": "98feb731-9535-42ff-a6c4-30faa7ab5136/493090e5-868b-42d8-9ec8-4a2924054eba.png",
+            "destinationUrl": "https://karate.com/app",
+            "alt": "Karate Combat - Play to win, never to lose with the Karate Combat app",
+            "companyName": "Karate Combat"
+          }
+        }
+      ]
+    }
+  ],
+  "campaigns2": [
+    {
+      "campaignId": "cc74a446-1ec1-43ac-a604-cee8e105345d",
+      "logo": {
+        "imageUrl": "0002dfb8-5e06-46b7-b433-8061239e1b57/8ceb2fcb-a44e-466f-891b-f035fca2b9c7.png",
+        "destinationUrl": "https://www.youtube.com/watch?v=hy1L97OA9OQ",
+        "alt": "Coinage - Best Dish Ever - Learn More",
+        "companyName": "Coinage"
+      },
+      "wallpapers": [
+        {
+          "imageUrl": "0002dfb8-5e06-46b7-b433-8061239e1b57/4ee2cc91-de63-4114-bccf-35966e5bd22d.jpg",
+          "creativeInstanceId": "1d329b0d-f67b-48ad-ac5d-ae15c241eea7",
+          "focalPoint": {
+            "x": 1280,
+            "y": 720
+          }
+        },
+        {
+          "imageUrl": "13017f86-2a00-4edc-8202-81a45fa750c8/11b2f1dc-3c05-4ab1-8f11-86b14d1a9602.jpg",
+          "creativeInstanceId": "6952c2d9-b6aa-45a5-9545-818af1dc293a",
+          "focalPoint": {
+            "x": 1551,
+            "y": 720
+          },
+          "logo": {
+            "imageUrl": "13017f86-2a00-4edc-8202-81a45fa750c8/5e6a6926-d8e7-4471-b913-691d56beec72.png",
+            "destinationUrl": "https://www.guanocoin.com/",
+            "alt": "Guano - Unlock reward! Secure your $BAT tokens in the BAT cave on solana and start earning $GUANO",
+            "companyName": "Guano"
+          }
+        },
+        {
+          "imageUrl": "98feb731-9535-42ff-a6c4-30faa7ab5136/40214b87-45c5-4133-a771-01a6c1daf6ab.jpg",
+          "creativeInstanceId": "e6b9c1ca-d49b-47cb-84e8-60344afe4719",
+          "focalPoint": {
+            "x": 1280,
+            "y": 720
+          },
+          "logo": {
+            "imageUrl": "98feb731-9535-42ff-a6c4-30faa7ab5136/493090e5-868b-42d8-9ec8-4a2924054eba.png",
+            "destinationUrl": "https://karate.com/app",
+            "alt": "Karate Combat - Play to win, never to lose with the Karate Combat app",
+            "companyName": "Karate Combat"
+          }
+        }
+      ]
+    }
+  ]
+}
