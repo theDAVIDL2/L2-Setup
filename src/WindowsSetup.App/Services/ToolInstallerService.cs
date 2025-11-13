@@ -147,6 +147,9 @@ namespace WindowsSetup.App.Services
             var orderedTools = tools.OrderBy(t => t.Priority).ToList();
             var totalTools = orderedTools.Count;
             var currentTool = 0;
+            var failedTools = new List<(string Name, string Error)>();
+            var skippedTools = new List<string>();
+            var successfulTools = new List<string>();
 
             foreach (var tool in orderedTools)
             {
@@ -160,6 +163,7 @@ namespace WindowsSetup.App.Services
                     if (await IsToolInstalled(tool))
                     {
                         _logger.LogInfo($"[{currentTool}/{totalTools}] {tool.Name} is already installed, skipping...");
+                        skippedTools.Add(tool.Name);
                         continue;
                     }
 
@@ -175,6 +179,7 @@ namespace WindowsSetup.App.Services
                     }
 
                     _logger.LogSuccess($"[{currentTool}/{totalTools}] {tool.Name} installed successfully!");
+                    successfulTools.Add(tool.Name);
 
                     // Run post-install command if specified
                     if (!string.IsNullOrEmpty(tool.PostInstallCommand))
@@ -194,11 +199,13 @@ namespace WindowsSetup.App.Services
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError($"Failed to install {tool.Name}: {ex.Message}");
+                    var errorMsg = ex.Message;
+                    _logger.LogError($"❌ [{currentTool}/{totalTools}] FAILED to install {tool.Name}: {errorMsg}");
+                    failedTools.Add((tool.Name, errorMsg));
                     
                     if (tool.Essential)
                     {
-                        _logger.LogWarning($"{tool.Name} is essential. Some features may not work properly.");
+                        _logger.LogWarning($"⚠️ {tool.Name} is ESSENTIAL. Some features may not work properly!");
                     }
                 }
 
@@ -207,7 +214,44 @@ namespace WindowsSetup.App.Services
             }
 
             _progressCallback(100, "Installation complete!");
-            _logger.LogSuccess($"=== Installation Complete! Installed {totalTools} tools ===");
+            
+            // Summary report
+            _logger.LogInfo("");
+            _logger.LogInfo("═══════════════════════════════════════");
+            _logger.LogInfo("📊 INSTALLATION SUMMARY");
+            _logger.LogInfo("═══════════════════════════════════════");
+            _logger.LogSuccess($"✅ Successfully installed: {successfulTools.Count}");
+            if (successfulTools.Any())
+            {
+                foreach (var tool in successfulTools)
+                {
+                    _logger.LogInfo($"   • {tool}");
+                }
+            }
+            
+            if (skippedTools.Any())
+            {
+                _logger.LogInfo($"⏭️ Skipped (already installed): {skippedTools.Count}");
+                foreach (var tool in skippedTools)
+                {
+                    _logger.LogInfo($"   • {tool}");
+                }
+            }
+            
+            if (failedTools.Any())
+            {
+                _logger.LogError($"❌ Failed installations: {failedTools.Count}");
+                foreach (var (name, error) in failedTools)
+                {
+                    _logger.LogError($"   • {name}: {error}");
+                }
+                _logger.LogWarning("⚠️ Some tools failed to install. Check errors above.");
+            }
+            else
+            {
+                _logger.LogSuccess("🎉 All tools installed successfully!");
+            }
+            _logger.LogInfo("═══════════════════════════════════════");
         }
 
         private async Task<bool> IsToolInstalled(ToolDefinition tool)
@@ -253,54 +297,111 @@ namespace WindowsSetup.App.Services
                 throw new ArgumentException("DirectUrl is required for direct installation");
             }
 
-            _logger.LogInfo($"Downloading {tool.Name} from {tool.DirectUrl}...");
-
-            var fileName = Path.GetFileName(new Uri(tool.DirectUrl).LocalPath);
-            if (string.IsNullOrEmpty(fileName))
+            try
             {
-                fileName = $"{tool.Name.Replace(" ", "_")}_installer.exe";
-            }
+                _logger.LogInfo($"Downloading {tool.Name} from {tool.DirectUrl}...");
 
-            var downloadPath = Path.Combine(_cacheDir, fileName);
-
-            // Download if not in cache
-            if (!File.Exists(downloadPath))
-            {
-                var downloadItem = new DownloadItem
+                var fileName = Path.GetFileName(new Uri(tool.DirectUrl).LocalPath);
+                if (string.IsNullOrEmpty(fileName))
                 {
-                    FileName = fileName,
-                    Url = tool.DirectUrl,
-                    Destination = downloadPath
-                };
-
-                await _downloadManager.DownloadWithProgressAsync(downloadItem);
-            }
-            else
-            {
-                _logger.LogInfo($"Using cached installer: {fileName}");
-            }
-
-            // Install
-            _logger.LogInfo($"Installing {tool.Name}...");
-            
-            var silentArgs = tool.SilentArgs ?? "/S";
-            
-            var process = Process.Start(new ProcessStartInfo
-            {
-                FileName = downloadPath,
-                Arguments = silentArgs,
-                UseShellExecute = true,
-                Verb = "runas"
-            });
-
-            if (process != null)
-            {
-                await process.WaitForExitAsync();
-                
-                if (process.ExitCode != 0)
-                {
-                    _logger.LogWarning($"Installer exited with code {process.ExitCode}");
+                    fileName = $"{tool.Name.Replace(" ", "_")}_installer.exe";
                 }
+
+                var downloadPath = Path.Combine(_cacheDir, fileName);
+
+                // Download if not in cache
+                if (!File.Exists(downloadPath))
+                {
+                    var downloadItem = new DownloadItem
+                    {
+                        FileName = fileName,
+                        Url = tool.DirectUrl,
+                        Destination = downloadPath
+                    };
+
+                    try
+                    {
+                        await _downloadManager.DownloadWithProgressAsync(downloadItem);
+                        
+                        // Verify download succeeded
+                        if (!File.Exists(downloadPath) || new FileInfo(downloadPath).Length == 0)
+                        {
+                            throw new Exception("Download failed - file is missing or empty");
+                        }
+                        
+                        _logger.LogSuccess($"Downloaded successfully: {fileName}");
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new Exception($"Download failed: {ex.Message}", ex);
+                    }
+                }
+                else
+                {
+                    _logger.LogInfo($"Using cached installer: {fileName}");
+                }
+
+                // Verify installer file exists before running
+                if (!File.Exists(downloadPath))
+                {
+                    throw new Exception($"Installer file not found: {downloadPath}");
+                }
+
+                // Install
+                _logger.LogInfo($"Installing {tool.Name}...");
+                
+                var silentArgs = tool.SilentArgs ?? "/S";
+                
+                try
+                {
+                    var process = Process.Start(new ProcessStartInfo
+                    {
+                        FileName = downloadPath,
+                        Arguments = silentArgs,
+                        UseShellExecute = true,
+                        Verb = "runas" // Requires admin
+                    });
+
+                    if (process == null)
+                    {
+                        throw new Exception("Failed to start installer process (process is null). User may have cancelled UAC prompt.");
+                    }
+
+                    _logger.LogInfo($"Waiting for installer to complete...");
+                    await process.WaitForExitAsync();
+                    
+                    if (process.ExitCode != 0)
+                    {
+                        // Some installers return non-zero for "already installed" or "user cancelled"
+                        var errorMsg = $"Installer exited with code {process.ExitCode}";
+                        
+                        // Common exit codes
+                        if (process.ExitCode == 1602 || process.ExitCode == 1223)
+                        {
+                            throw new Exception($"{errorMsg} (User cancelled installation)");
+                        }
+                        else if (process.ExitCode == 1638)
+                        {
+                            _logger.LogWarning($"{errorMsg} (Already installed - skipping)");
+                            return; // Don't throw for "already installed"
+                        }
+                        else
+                        {
+                            throw new Exception($"{errorMsg}. Installation may have failed.");
+                        }
+                    }
+                    
+                    _logger.LogSuccess($"{tool.Name} installer completed successfully");
+                }
+                catch (System.ComponentModel.Win32Exception ex)
+                {
+                    throw new Exception($"Failed to start installer: {ex.Message}. Ensure you have administrator rights.", ex);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"❌ Installation failed for {tool.Name}: {ex.Message}");
+                throw; // Re-throw to let caller know it failed
             }
         }
 

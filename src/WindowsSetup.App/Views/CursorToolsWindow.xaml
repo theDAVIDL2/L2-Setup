@@ -1,0 +1,233 @@
+<Window x:Class="WindowsSetup.App.Views.CursorToolsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        Title="L2 Setup - Cursor Configuration Manager" 
+        Height="700" Width="900"
+        WindowStartupLocation="CenterScreen"
+        Background="{DynamicResource MaterialDesignPaper}"
+        FontFamily="{DynamicResource MaterialDesignFont}"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        ResizeMode="CanResizeWithGrip">
+
+    <Window.Resources>
+        <Style x:Key="CardButton" TargetType="Button" BasedOn="{StaticResource MaterialDesignRaisedButton}">
+            <Setter Property="Margin" Value="8"/>
+            <Setter Property="Height" Value="120"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <materialDesign:ColorZone Grid.Row="0" Mode="PrimaryMid" Padding="16">
+            <StackPanel>
+                <TextBlock Text="🎯 Cursor IDE Configuration Manager" 
+                          Style="{StaticResource MaterialDesignHeadline5TextBlock}"
+                          Foreground="White"/>
+                <TextBlock x:Name="HeaderStatus" 
+                          Text="Professional tools for managing Cursor IDE configuration and machine identifiers" 
+                          Style="{StaticResource MaterialDesignBody2TextBlock}"
+                          Foreground="White" Opacity="0.9"/>
+            </StackPanel>
+        </materialDesign:ColorZone>
+
+        <!-- Main Content -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="16">
+            <StackPanel>
+                
+                <!-- Cursor Status Card -->
+                <materialDesign:Card Margin="0,0,0,16" Padding="16">
+                    <StackPanel>
+                        <TextBlock Text="📊 Cursor Status" FontSize="16" FontWeight="Bold" Margin="0,0,0,12"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" x:Name="StatusPanel">
+                                <TextBlock x:Name="StatusInstalled" Text="✅ Cursor is installed" Margin="0,4"/>
+                                <TextBlock x:Name="StatusRunning" Text="⚪ Cursor is not running" Margin="0,4"/>
+                                <TextBlock x:Name="StatusWorkspaces" Text="📁 Workspaces: 0" Margin="0,4"/>
+                                <TextBlock x:Name="StatusSize" Text="💾 Config size: 0 MB" Margin="0,4"/>
+                                <TextBlock x:Name="StatusLastModified" Text="🕐 Last modified: Never" Margin="0,4"/>
+                            </StackPanel>
+                            <Button Grid.Column="1" Style="{StaticResource MaterialDesignOutlinedButton}" 
+                                    Content="🔄 Refresh" Click="RefreshStatus_Click" 
+                                    VerticalAlignment="Center" Padding="16,8"/>
+                        </Grid>
+                    </StackPanel>
+                </materialDesign:Card>
+
+                <!-- Quick Actions -->
+                <materialDesign:Card Margin="0,0,0,16" Padding="16">
+                    <StackPanel>
+                        <TextBlock Text="⚡ Quick Actions" FontSize="16" FontWeight="Bold" Margin="0,0,0,12"/>
+                        <UniformGrid Columns="3" Rows="2">
+                            <!-- Machine ID Spoofer -->
+                            <Button Style="{StaticResource CardButton}" Click="ResetTrial_Click"
+                                    Background="#FF6B00">
+                                <StackPanel HorizontalAlignment="Center">
+                                    <TextBlock Text="🎯" FontSize="32" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="Machine ID Spoofer" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,8,0,4"/>
+                                    <TextBlock Text="Change Windows IDs" FontSize="11" Opacity="0.8" HorizontalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+
+                            <!-- Backup Configuration -->
+                            <Button Style="{StaticResource CardButton}" Click="BackupSettings_Click"
+                                    Background="#2196F3">
+                                <StackPanel HorizontalAlignment="Center">
+                                    <TextBlock Text="💾" FontSize="32" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="Backup Config" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,8,0,4"/>
+                                    <TextBlock Text="Save settings" FontSize="11" Opacity="0.8" HorizontalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+
+                            <!-- Restore Configuration -->
+                            <Button Style="{StaticResource CardButton}" Click="RestoreSettings_Click"
+                                    Background="#FF9800">
+                                <StackPanel HorizontalAlignment="Center">
+                                    <TextBlock Text="♻️" FontSize="32" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="Restore Config" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,8,0,4"/>
+                                    <TextBlock Text="Load from backup" FontSize="11" Opacity="0.8" HorizontalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+
+                            <!-- Clear Cache -->
+                            <Button Style="{StaticResource CardButton}" Click="ClearCache_Click"
+                                    Background="#9C27B0">
+                                <StackPanel HorizontalAlignment="Center">
+                                    <TextBlock Text="🗑️" FontSize="32" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="Clear Cache" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,8,0,4"/>
+                                    <TextBlock Text="Remove temp files" FontSize="11" Opacity="0.8" HorizontalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+
+                            <!-- View Machine IDs -->
+                            <Button Style="{StaticResource CardButton}" Click="ViewMachineIds_Click"
+                                    Background="#00BCD4">
+                                <StackPanel HorizontalAlignment="Center">
+                                    <TextBlock Text="👁️" FontSize="32" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="View Machine IDs" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,8,0,4"/>
+                                    <TextBlock Text="Show identifiers" FontSize="11" Opacity="0.8" HorizontalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+
+                            <!-- Open Config Folder -->
+                            <Button Style="{StaticResource CardButton}" Click="OpenConfigFolder_Click"
+                                    Background="#607D8B">
+                                <StackPanel HorizontalAlignment="Center">
+                                    <TextBlock Text="📁" FontSize="32" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="Config Folder" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,8,0,4"/>
+                                    <TextBlock Text="Browse files" FontSize="11" Opacity="0.8" HorizontalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+                        </UniformGrid>
+                    </StackPanel>
+                </materialDesign:Card>
+
+                <!-- Backups List -->
+                <materialDesign:Card Margin="0,0,0,16" Padding="16">
+                    <StackPanel>
+                        <Grid Margin="0,0,0,12">
+                            <TextBlock Text="📦 Available Backups" FontSize="16" FontWeight="Bold" 
+                                      VerticalAlignment="Center"/>
+                            <Button HorizontalAlignment="Right" 
+                                    Style="{StaticResource MaterialDesignOutlinedButton}"
+                                    Content="🔄 Refresh" Click="RefreshBackups_Click" Padding="12,6"/>
+                        </Grid>
+                        
+                        <ListBox x:Name="BackupsList" Height="180" 
+                                SelectionMode="Single"
+                                materialDesign:ListBoxAssist.IsToggle="False">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="8">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Grid.Column="0">
+                                            <TextBlock Text="{Binding FileName}" FontWeight="Bold"/>
+                                            <TextBlock Text="{Binding Info}" FontSize="11" Opacity="0.7"/>
+                                        </StackPanel>
+                                        <Button Grid.Column="1" 
+                                                Style="{StaticResource MaterialDesignFlatButton}"
+                                                Content="♻️ Restore" 
+                                                Click="RestoreSpecificBackup_Click"
+                                                Tag="{Binding FullPath}"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </StackPanel>
+                </materialDesign:Card>
+
+                <!-- Advanced Options -->
+                <Expander Margin="0,0,0,16">
+                    <Expander.Header>
+                        <TextBlock Text="⚙️ Advanced Options" FontSize="14" FontWeight="Bold"/>
+                    </Expander.Header>
+                    <StackPanel Margin="16">
+                        <TextBlock Text="⚠️ Experimental Features" FontWeight="Bold" Foreground="#FF9800" Margin="0,0,0,12"/>
+                        
+                        <!-- Advanced Actions Grid -->
+                        <UniformGrid Columns="2" Rows="2" Margin="0,0,0,16">
+                            <Button Content="🚫 Disable Auto-Update" Click="DisableAutoUpdate_Click"
+                                    Style="{StaticResource MaterialDesignRaisedButton}" 
+                                    Background="#FF5722" Margin="4" Height="60"/>
+                            
+                            <Button Content="🔄 Totally Reset Cursor" Click="TotallyResetCursor_Click"
+                                    Style="{StaticResource MaterialDesignRaisedButton}" 
+                                    Background="#D32F2F" Margin="4" Height="60"/>
+                            
+                            <Button Content="📋 Show Full Config" Click="ShowFullConfig_Click"
+                                    Style="{StaticResource MaterialDesignRaisedButton}" 
+                                    Background="#1976D2" Margin="4" Height="60"/>
+                            
+                            <Button Content="🔒 Close Cursor Now" Click="CloseCursor_Click"
+                                    Style="{StaticResource MaterialDesignRaisedButton}" 
+                                    Background="#607D8B" Margin="4" Height="60"/>
+                        </UniformGrid>
+                        
+                        <Separator Margin="0,8"/>
+                        
+                        <TextBlock Text="Options" FontWeight="Bold" Margin="0,12,0,8"/>
+                        <CheckBox x:Name="ChkAutoClose" Content="Auto-close Cursor when needed" IsChecked="True" Margin="0,4"/>
+                        <CheckBox x:Name="ChkClearWorkspaces" Content="Include workspace storage when clearing cache" Margin="0,4"/>
+                    </StackPanel>
+                </Expander>
+
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Log Output -->
+        <materialDesign:Card Grid.Row="2" Margin="16" Padding="12">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="150"/>
+                </Grid.RowDefinitions>
+                <TextBlock Text="📋 Output Log" FontWeight="Bold" Margin="0,0,0,8"/>
+                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                    <TextBlock x:Name="LogOutput" 
+                              FontFamily="Consolas" 
+                              FontSize="11"
+                              TextWrapping="Wrap"
+                              Background="#F5F5F5"
+                              Padding="8"/>
+                </ScrollViewer>
+            </Grid>
+        </materialDesign:Card>
+
+    </Grid>
+</Window>
+

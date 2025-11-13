@@ -119,9 +119,109 @@
                            Click="OptimizeWindows_Click"
                            Background="#9C27B0"/>
                     
+                    <Button Content="♻️ Restore from Backup" 
+                           Click="RestoreOptimizations_Click"
+                           Background="#FF9800"
+                           ToolTip="Restore from a backup created before optimizations"/>
+                    
+                    <Button Content="🔄 Reset to Safe Defaults (No Backup Needed)" 
+                           Click="ResetToSafeDefaults_Click"
+                           Background="#4CAF50"
+                           ToolTip="Undo risky optimizations and restore Windows defaults (works without backup!)"/>
+                    
                     <Button Content="Activate Windows" 
                            Click="ActivateWindows_Click"
                            Background="#F44336"/>
+                </StackPanel>
+            </TabItem>
+
+            <!-- Cursor Tools Tab -->
+            <TabItem Header="Cursor Tools">
+                <StackPanel Margin="20">
+                    <TextBlock Text="🎯 Cursor IDE Management &amp; Spoofer" 
+                              Style="{StaticResource MaterialDesignHeadline6TextBlock}" 
+                              Margin="0,0,0,20"/>
+                    
+                    <TextBlock Text="Professional Machine ID Spoofer - Changes Windows registry IDs, spoofs system GUIDs, manages Cursor configuration, backup/restore, and more!" 
+                              TextWrapping="Wrap"
+                              Margin="0,0,0,20"
+                              Opacity="0.7"/>
+                    
+                    <Button Content="🎯 Open Machine ID Spoofer &amp; Cursor Tools" 
+                           Click="OpenCursorTools_Click"
+                           Background="#00BCD4"
+                           Height="60"
+                           FontSize="16"
+                           FontWeight="Bold"/>
+                    
+                    <TextBlock Text="Available Tools:" 
+                              FontWeight="Bold"
+                              Margin="0,20,0,8"/>
+                    <TextBlock TextWrapping="Wrap" Opacity="0.8" LineHeight="22">
+                        • 🔄 Change Machine ID - Regenerate device identifiers<LineBreak/>
+                        • 💾 Backup &amp; Restore - Save and restore your configuration<LineBreak/>
+                        • 🗑️ Clear Cache - Remove temporary files and cache<LineBreak/>
+                        • 👁️ View Machine IDs - Display current device identifiers<LineBreak/>
+                        • 📁 Config Manager - Quick access to configuration folder<LineBreak/>
+                        • ⚙️ Advanced Tools - Disable updates, total reset, and more
+                    </TextBlock>
+                </StackPanel>
+            </TabItem>
+
+            <!-- System ID Spoofer Tab -->
+            <TabItem Header="System ID Spoofer">
+                <StackPanel Margin="20">
+                    <TextBlock Text="🎭 System Identity Spoofer" 
+                              Style="{StaticResource MaterialDesignHeadline6TextBlock}" 
+                              Margin="0,0,0,20"/>
+                    
+                    <TextBlock Text="ADVANCED: Comprehensive system-wide identity spoofing tool for security testing. Spoof machine GUIDs, MAC addresses, volume serials, and mask your IP with Tor/VPN integration." 
+                              TextWrapping="Wrap"
+                              Margin="0,0,0,20"
+                              Opacity="0.7"/>
+                    
+                    <Button Content="🚀 Open System ID Spoofer" 
+                           Click="OpenSystemIdSpoofer_Click"
+                           Background="#FF5722"
+                           Height="60"
+                           FontSize="16"
+                           FontWeight="Bold"
+                           Foreground="White"/>
+                    
+                    <!-- Warning panel -->
+                    <materialDesign:Card Background="#FFF3E0" Margin="0,20,0,0">
+                        <StackPanel Margin="16">
+                            <TextBlock Text="⚠️ WARNING: Advanced Tool" FontWeight="Bold" Foreground="#E65100"/>
+                            <TextBlock TextWrapping="Wrap" Margin="0,8,0,0" Foreground="#E65100">
+                                This tool modifies system-level identifiers and network settings. Improper use may cause:
+                            </TextBlock>
+                            <TextBlock TextWrapping="Wrap" Margin="16,8,0,0" Foreground="#E65100">
+                                • Windows activation issues<LineBreak/>
+                                • Software licensing problems<LineBreak/>
+                                • Network connectivity issues<LineBreak/>
+                                • System instability
+                            </TextBlock>
+                            <TextBlock TextWrapping="Wrap" Margin="0,8,0,0" FontWeight="Bold" Foreground="#E65100">
+                                ✓ Use for security testing only<LineBreak/>
+                                ✓ Always create backups first<LineBreak/>
+                                ✓ Test on virtual machine if possible<LineBreak/>
+                                ✓ Requires Administrator privileges
+                            </TextBlock>
+                        </StackPanel>
+                    </materialDesign:Card>
+                    
+                    <TextBlock Text="Features:" 
+                              FontWeight="Bold"
+                              Margin="0,20,0,8"/>
+                    <TextBlock TextWrapping="Wrap" Opacity="0.8" LineHeight="22">
+                        • 🔧 Machine GUID Spoofing - Change Windows system identifiers<LineBreak/>
+                        • 🌐 MAC Address Spoofing - Real-time network adapter changes<LineBreak/>
+                        • 💽 Volume Serial Spoofing - Change disk serial numbers<LineBreak/>
+                        • 🧅 Tor Integration - Anonymous browsing<LineBreak/>
+                        • 🔐 OpenVPN Support - VPN connection management<LineBreak/>
+                        • 💾 Backup &amp; Restore - Full system ID backup<LineBreak/>
+                        • ↩️ Toggleable Changes - Easy restore to original
+                    </TextBlock>
                 </StackPanel>
             </TabItem>
 

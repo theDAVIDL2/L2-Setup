@@ -71,6 +71,7 @@ namespace WindowsSetup.App
                     ["Package Managers"] = allTools.Where(t => t.Priority >= 40 && t.Priority < 50).ToList(),
                     ["Gaming & Communication"] = allTools.Where(t => t.Priority >= 50 && t.Priority < 60).ToList(),
                     ["Utilities"] = allTools.Where(t => t.Priority >= 60 && t.Priority < 70).ToList(),
+                    ["System Tools"] = allTools.Where(t => t.Priority >= 70 && t.Priority < 75).ToList(),
                     ["Development Tools"] = allTools.Where(t => t.Priority >= 75 && t.Priority < 100).ToList(),
                     ["Runtimes"] = allTools.Where(t => t.Priority >= 100).ToList()
                 };
@@ -407,6 +408,90 @@ namespace WindowsSetup.App
                     _logger.LogSuccess("Activation process complete!");
                     MessageBox.Show("Activation process completed!", "Success", 
                         MessageBoxButton.OK, MessageBoxImage.Information);
+                });
+            }
+        }
+
+        private void OpenCursorTools_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                _logger.LogInfo("Opening Cursor Tools window...");
+                var cursorToolsWindow = new Views.CursorToolsWindow();
+                cursorToolsWindow.ShowDialog();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error opening Cursor Tools: {ex.Message}");
+                MessageBox.Show($"Failed to open Cursor Tools:\n{ex.Message}", 
+                    "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void OpenSystemIdSpoofer_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                _logger.LogInfo("Opening System ID Spoofer window...");
+                var spooferWindow = new Views.SystemIdSpooferWindow();
+                spooferWindow.ShowDialog();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error opening System ID Spoofer: {ex.Message}");
+                MessageBox.Show($"Failed to open System ID Spoofer:\n{ex.Message}", 
+                    "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void RestoreOptimizations_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                _logger.LogInfo("Opening Restore Settings window...");
+                var restoreWindow = new Views.OptimizationRestoreWindow();
+                restoreWindow.ShowDialog();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error opening Restore window: {ex.Message}");
+                MessageBox.Show($"Failed to open Restore window:\n{ex.Message}", 
+                    "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private async void ResetToSafeDefaults_Click(object sender, RoutedEventArgs e)
+        {
+            if (_windowsOptimizer == null) return;
+
+            var result = MessageBox.Show(
+                "This will reset Windows to SAFE DEFAULTS without needing a backup.\n\n" +
+                "What will be restored:\n" +
+                "• Network settings (TCP/IP, DNS, Winsock)\n" +
+                "• Important services (Windows Search, Superfetch, etc.)\n" +
+                "• Visual effects (transparency, animations)\n" +
+                "• Windows features (background apps, startup programs)\n\n" +
+                "⚠️ This will UNDO most risky optimizations.\n" +
+                "⚠️ A system restart is recommended after this.\n\n" +
+                "Continue?",
+                "Reset to Safe Defaults",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question);
+
+            if (result == MessageBoxResult.Yes)
+            {
+                await ExecuteSafe(async () =>
+                {
+                    _logger.LogInfo("Resetting to safe defaults...");
+                    await _windowsOptimizer.ResetToSafeDefaults();
+                    
+                    MessageBox.Show(
+                        "✅ System reset to safe defaults!\n\n" +
+                        "All risky optimizations have been reverted.\n\n" +
+                        "⚠️ Please RESTART your computer for all changes to take effect.",
+                        "Reset Complete",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Information);
                 });
             }
         }

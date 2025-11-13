@@ -56,6 +56,32 @@
 
 ---
 
+## ⚠️ Optimizations Status
+
+**IMPORTANT UPDATE:** Most Windows optimizations are currently **DISABLED by default** due to stability concerns.
+
+### ✅ What's ENABLED (Safe Options Only):
+- ✅ **Power Management** - High Performance power plan
+- ✅ **Mouse Settings** - Disable mouse acceleration
+- ✅ **Privacy & Telemetry** - Disable Windows telemetry, Cortana, advertising ID, location tracking
+- ✅ **Gaming Basics** - Game Mode, disable Game Bar/DVR
+- ✅ **UI Tweaks** - Show file extensions, show hidden files
+- ✅ **Cleanup** - Temporary files cleanup
+
+### ⚠️ What's DISABLED (Potentially Unstable):
+- ⚠️ Visual effects, transparency, animations
+- ⚠️ All network optimizations (TCP/IP, DNS, etc.)
+- ⚠️ CPU/Memory optimizations (core parking, scheduling)
+- ⚠️ Storage optimizations (SSD, indexing, prefetch)
+- ⚠️ Service modifications (Windows Search, Superfetch, etc.)
+- ⚠️ Debloat features (app removal, widgets, etc.)
+
+**Why?** Advanced optimizations can cause system instability, break functionality, or require troubleshooting. We're focusing on reliability.
+
+💡 **A system restore point is ALWAYS created before applying any optimizations.**
+
+---
+
 ## ✨ Features
 
 ### 🌐 Browser Management (PRE & POST FORMAT)

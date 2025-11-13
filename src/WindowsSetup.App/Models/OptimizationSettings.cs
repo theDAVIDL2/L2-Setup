@@ -3,125 +3,125 @@ namespace WindowsSetup.App.Models
     public class OptimizationSettings
     {
         // ═══════════════════════════════════════════════════════════════
-        // 🚀 PERFORMANCE OPTIMIZATIONS
+        // 🚀 PERFORMANCE OPTIMIZATIONS (SAFE - Enabled by default)
         // ═══════════════════════════════════════════════════════════════
         
-        public bool HighPerformancePowerPlan { get; set; } = true;
-        public bool DisableMouseAcceleration { get; set; } = true;
-        public bool OptimizeVisualEffects { get; set; } = true;
-        public bool OptimizeExplorer { get; set; } = true;
-        public bool DisableStartupPrograms { get; set; } = false;
-        public bool OptimizePageFile { get; set; } = false;
-        public bool DisableBackgroundApps { get; set; } = true; // NEW
-        public bool DisableTransparency { get; set; } = true; // NEW
-        public bool DisableAnimations { get; set; } = true; // NEW
+        public bool HighPerformancePowerPlan { get; set; } = true; // ✅ SAFE
+        public bool DisableMouseAcceleration { get; set; } = true; // ✅ SAFE
+        public bool OptimizeVisualEffects { get; set; } = false; // ⚠️ DISABLED - Can affect UI
+        public bool OptimizeExplorer { get; set; } = false; // ⚠️ DISABLED - Unstable
+        public bool DisableStartupPrograms { get; set; } = false; // ⚠️ DISABLED
+        public bool OptimizePageFile { get; set; } = false; // ⚠️ DISABLED
+        public bool DisableBackgroundApps { get; set; } = false; // ⚠️ DISABLED
+        public bool DisableTransparency { get; set; } = false; // ⚠️ DISABLED
+        public bool DisableAnimations { get; set; } = false; // ⚠️ DISABLED
         
         // ═══════════════════════════════════════════════════════════════
-        // 🔒 PRIVACY & TELEMETRY
+        // 🔒 PRIVACY & TELEMETRY (SAFE - Enabled by default)
         // ═══════════════════════════════════════════════════════════════
         
-        public bool DisableTelemetry { get; set; } = true;
-        public bool DisableCortana { get; set; } = true;
-        public bool DisableAdvertisingId { get; set; } = true;
-        public bool DisableLocationTracking { get; set; } = true;
-        public bool DisableDiagnostics { get; set; } = true;
-        public bool DisableActivityHistory { get; set; } = true; // NEW
-        public bool DisableWebSearch { get; set; } = true; // NEW
-        public bool DisableBiometrics { get; set; } = false; // NEW
-        public bool DisableCameraAccess { get; set; } = false; // NEW
+        public bool DisableTelemetry { get; set; } = true; // ✅ SAFE
+        public bool DisableCortana { get; set; } = true; // ✅ SAFE
+        public bool DisableAdvertisingId { get; set; } = true; // ✅ SAFE
+        public bool DisableLocationTracking { get; set; } = true; // ✅ SAFE
+        public bool DisableDiagnostics { get; set; } = true; // ✅ SAFE
+        public bool DisableActivityHistory { get; set; } = false; // ⚠️ DISABLED
+        public bool DisableWebSearch { get; set; } = false; // ⚠️ DISABLED
+        public bool DisableBiometrics { get; set; } = false; // ⚠️ DISABLED
+        public bool DisableCameraAccess { get; set; } = false; // ⚠️ DISABLED
         
         // ═══════════════════════════════════════════════════════════════
-        // ⚙️ SERVICES & FEATURES
+        // ⚙️ SERVICES & FEATURES (ALL DISABLED - Potentially unstable)
         // ═══════════════════════════════════════════════════════════════
         
-        public bool DisablePrintSpooler { get; set; } = false;
-        public bool DisableFax { get; set; } = false;
-        public bool DisableWindowsSearch { get; set; } = false;
-        public bool DisableSuperfetch { get; set; } = false;
-        public bool SetWindowsUpdateManual { get; set; } = false;
-        public bool DisableWindowsDefender { get; set; } = false; // EXPERT MODE
-        public bool DisableFirewall { get; set; } = false; // EXPERT MODE
-        public bool DisableUAC { get; set; } = false; // EXPERT MODE
-        public bool DisableSmartScreen { get; set; } = false; // NEW
+        public bool DisablePrintSpooler { get; set; } = false; // ⚠️ DISABLED
+        public bool DisableFax { get; set; } = false; // ⚠️ DISABLED
+        public bool DisableWindowsSearch { get; set; } = false; // ⚠️ DISABLED
+        public bool DisableSuperfetch { get; set; } = false; // ⚠️ DISABLED
+        public bool SetWindowsUpdateManual { get; set; } = false; // ⚠️ DISABLED
+        public bool DisableWindowsDefender { get; set; } = false; // ⚠️ DISABLED - DANGEROUS
+        public bool DisableFirewall { get; set; } = false; // ⚠️ DISABLED - DANGEROUS
+        public bool DisableUAC { get; set; } = false; // ⚠️ DISABLED - DANGEROUS
+        public bool DisableSmartScreen { get; set; } = false; // ⚠️ DISABLED
         
         // ═══════════════════════════════════════════════════════════════
-        // 🎮 GAMING OPTIMIZATIONS
+        // 🎮 GAMING OPTIMIZATIONS (Mostly disabled due to stability)
         // ═══════════════════════════════════════════════════════════════
         
-        public bool EnableGameMode { get; set; } = true;
-        public bool DisableGameBar { get; set; } = true;
-        public bool DisableGameDVR { get; set; } = true;
-        public bool EnableHardwareAcceleratedGPU { get; set; } = true;
-        public bool DisableFullscreenOptimizations { get; set; } = true; // NEW
-        public bool OptimizeCPUScheduling { get; set; } = true; // NEW
-        public bool DisableNagleAlgorithm { get; set; } = true; // NEW - Network gaming
+        public bool EnableGameMode { get; set; } = true; // ✅ SAFE
+        public bool DisableGameBar { get; set; } = true; // ✅ SAFE
+        public bool DisableGameDVR { get; set; } = true; // ✅ SAFE
+        public bool EnableHardwareAcceleratedGPU { get; set; } = false; // ⚠️ DISABLED - Can cause issues
+        public bool DisableFullscreenOptimizations { get; set; } = false; // ⚠️ DISABLED
+        public bool OptimizeCPUScheduling { get; set; } = false; // ⚠️ DISABLED
+        public bool DisableNagleAlgorithm { get; set; } = false; // ⚠️ DISABLED
         
         // ═══════════════════════════════════════════════════════════════
-        // 🌐 NETWORK OPTIMIZATIONS
+        // 🌐 NETWORK OPTIMIZATIONS (ALL DISABLED - Can break connectivity)
         // ═══════════════════════════════════════════════════════════════
         
-        public bool OptimizeTCPIP { get; set; } = true; // NEW
-        public bool DisableLargeSendOffload { get; set; } = false; // NEW
-        public bool OptimizeDNS { get; set; } = true; // NEW - Cloudflare 1.1.1.1
-        public bool DisableNetworkThrottling { get; set; } = true; // NEW
-        public bool OptimizeNetworkAdapter { get; set; } = true; // NEW
+        public bool OptimizeTCPIP { get; set; } = false; // ⚠️ DISABLED
+        public bool DisableLargeSendOffload { get; set; } = false; // ⚠️ DISABLED
+        public bool OptimizeDNS { get; set; } = false; // ⚠️ DISABLED
+        public bool DisableNetworkThrottling { get; set; } = false; // ⚠️ DISABLED
+        public bool OptimizeNetworkAdapter { get; set; } = false; // ⚠️ DISABLED
         
         // ═══════════════════════════════════════════════════════════════
-        // 🗑️ DEBLOAT & CLEANUP
+        // 🗑️ DEBLOAT & CLEANUP (Mostly disabled - Can remove needed apps)
         // ═══════════════════════════════════════════════════════════════
         
-        public bool CleanTempFiles { get; set; } = true;
-        public bool EmptyRecycleBin { get; set; } = false;
-        public bool DeleteWindowsOld { get; set; } = false;
-        public bool CleanDownloads { get; set; } = false;
-        public bool RemoveBloatwareApps { get; set; } = true; // NEW
-        public bool DisableWidgets { get; set; } = true; // NEW
-        public bool DisableNewsInterests { get; set; } = true; // NEW
-        public bool RemoveCoPilot { get; set; } = true; // NEW
-        public bool DisableChatIcon { get; set; } = true; // NEW
+        public bool CleanTempFiles { get; set; } = true; // ✅ SAFE
+        public bool EmptyRecycleBin { get; set; } = false; // User choice
+        public bool DeleteWindowsOld { get; set; } = false; // User choice
+        public bool CleanDownloads { get; set; } = false; // User choice
+        public bool RemoveBloatwareApps { get; set; } = false; // ⚠️ DISABLED - Can remove needed apps
+        public bool DisableWidgets { get; set; } = false; // ⚠️ DISABLED
+        public bool DisableNewsInterests { get; set; } = false; // ⚠️ DISABLED
+        public bool RemoveCoPilot { get; set; } = false; // ⚠️ DISABLED
+        public bool DisableChatIcon { get; set; } = false; // ⚠️ DISABLED
         
         // ═══════════════════════════════════════════════════════════════
-        // 💾 STORAGE & MEMORY
+        // 💾 STORAGE & MEMORY (ALL DISABLED - Can cause system issues)
         // ═══════════════════════════════════════════════════════════════
         
-        public bool DisableSearchIndexing { get; set; } = false; // NEW
-        public bool OptimizeSSD { get; set; } = true; // NEW - TRIM
-        public bool DisableSystemRestore { get; set; } = false; // NEW - Frees space
-        public bool CompactOS { get; set; } = false; // NEW - Compress Windows
-        public bool DisablePrefetch { get; set; } = false; // NEW
+        public bool DisableSearchIndexing { get; set; } = false; // ⚠️ DISABLED
+        public bool OptimizeSSD { get; set; } = false; // ⚠️ DISABLED
+        public bool DisableSystemRestore { get; set; } = false; // ⚠️ DISABLED
+        public bool CompactOS { get; set; } = false; // ⚠️ DISABLED
+        public bool DisablePrefetch { get; set; } = false; // ⚠️ DISABLED
         
         // ═══════════════════════════════════════════════════════════════
-        // 🖥️ CPU & MEMORY OPTIMIZATIONS
+        // 🖥️ CPU & MEMORY OPTIMIZATIONS (ALL DISABLED - Advanced tweaks)
         // ═══════════════════════════════════════════════════════════════
         
-        public bool DisableCoreParking { get; set; } = true; // NEW
-        public bool OptimizeProcessorScheduling { get; set; } = true; // NEW
-        public bool DisableSpectreMeltdown { get; set; } = false; // EXPERT - Security risk!
-        public bool OptimizeMemoryManagement { get; set; } = true; // NEW
-        public bool DisableWriteCacheBufferFlushing { get; set; } = false; // NEW
+        public bool DisableCoreParking { get; set; } = false; // ⚠️ DISABLED
+        public bool OptimizeProcessorScheduling { get; set; } = false; // ⚠️ DISABLED
+        public bool DisableSpectreMeltdown { get; set; } = false; // ⚠️ DISABLED - SECURITY RISK!
+        public bool OptimizeMemoryManagement { get; set; } = false; // ⚠️ DISABLED
+        public bool DisableWriteCacheBufferFlushing { get; set; } = false; // ⚠️ DISABLED
         
         // ═══════════════════════════════════════════════════════════════
-        // 🎨 VISUAL & UI TWEAKS
+        // 🎨 VISUAL & UI TWEAKS (Safe UI changes)
         // ═══════════════════════════════════════════════════════════════
         
-        public bool ShowFileExtensions { get; set; } = true;
-        public bool ShowHiddenFiles { get; set; } = true;
-        public bool DisableLockScreen { get; set; } = false; // NEW
-        public bool DisableActionCenter { get; set; } = false; // NEW
-        public bool ClassicContextMenu { get; set; } = true; // NEW - Win11
-        public bool TaskbarToLeft { get; set; } = false; // NEW - Win11
-        public bool DisableSnapAssist { get; set; } = false; // NEW
+        public bool ShowFileExtensions { get; set; } = true; // ✅ SAFE
+        public bool ShowHiddenFiles { get; set; } = true; // ✅ SAFE
+        public bool DisableLockScreen { get; set; } = false; // ⚠️ DISABLED
+        public bool DisableActionCenter { get; set; } = false; // ⚠️ DISABLED
+        public bool ClassicContextMenu { get; set; } = false; // ⚠️ DISABLED
+        public bool TaskbarToLeft { get; set; } = false; // ⚠️ DISABLED
+        public bool DisableSnapAssist { get; set; } = false; // ⚠️ DISABLED
         
         // ═══════════════════════════════════════════════════════════════
-        // ⚡ ADVANCED & EXPERT
+        // ⚡ ADVANCED & EXPERT (Mostly disabled)
         // ═══════════════════════════════════════════════════════════════
         
-        public bool CreateRestorePoint { get; set; } = true;
-        public bool DisableOneDrive { get; set; } = false;
-        public bool DisableHibernation { get; set; } = false;
-        public bool RunChrisTitusTechScript { get; set; } = false; // External script
-        public bool DisableFastStartup { get; set; } = false; // NEW
-        public bool DisableRemoteAssistance { get; set; } = true; // NEW
-        public bool DisableErrorReporting { get; set; } = true; // NEW
+        public bool CreateRestorePoint { get; set; } = true; // ✅ SAFE - Always create restore point
+        public bool DisableOneDrive { get; set; } = false; // ⚠️ DISABLED
+        public bool DisableHibernation { get; set; } = false; // ⚠️ DISABLED
+        public bool RunChrisTitusTechScript { get; set; } = false; // ⚠️ DISABLED - External script
+        public bool DisableFastStartup { get; set; } = false; // ⚠️ DISABLED
+        public bool DisableRemoteAssistance { get; set; } = false; // ⚠️ DISABLED
+        public bool DisableErrorReporting { get; set; } = false; // ⚠️ DISABLED
     }
 }

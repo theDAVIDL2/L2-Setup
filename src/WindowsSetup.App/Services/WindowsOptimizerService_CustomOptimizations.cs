@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
@@ -10,11 +11,17 @@ namespace WindowsSetup.App.Services
 {
     public partial class WindowsOptimizerService
     {
+        private OptimizationBackupService? _backupService;
+
         public async Task ApplyCustomOptimizations(OptimizationSettings settings)
         {
             try
             {
                 _logger.LogInfo("=== Applying Custom Windows Optimizations (L2 Enhanced) ===");
+
+                // Initialize backup service and start backup session
+                _backupService = new OptimizationBackupService(_logger);
+                _backupService.StartBackupSession("Custom Windows Optimizations");
 
                 if (settings.CreateRestorePoint)
                 {
@@ -109,6 +116,15 @@ namespace WindowsSetup.App.Services
                 if (settings.DisableHibernation) await DisableHibernation();
 
                 _logger.LogSuccess("=== L2 Enhanced Optimizations Applied Successfully! ===");
+                
+                // Save backup
+                var backupFile = await (_backupService?.SaveBackup() ?? Task.FromResult<string?>(null));
+                if (backupFile != null)
+                {
+                    _logger.LogInfo($"💾 Backup saved: {Path.GetFileName(backupFile)}");
+                    _logger.LogInfo("   Use 'Restore Previous Settings' to undo changes");
+                }
+                
                 _logger.LogWarning("⚠️ A REBOOT is RECOMMENDED for all changes to take effect!");
             }
             catch (Exception ex)
@@ -174,6 +190,9 @@ namespace WindowsSetup.App.Services
             _logger.LogInfo($"Disabling service: {serviceName}...");
             try
             {
+                // Backup before changing
+                await (_backupService?.BackupService(serviceName) ?? Task.CompletedTask);
+
                 await _commandRunner.RunCommandAsync("sc", $"config {serviceName} start=disabled");
                 await _commandRunner.RunCommandAsync("sc", $"stop {serviceName}");
             }
@@ -266,6 +285,10 @@ namespace WindowsSetup.App.Services
         {
             try
             {
+                // Backup before changing
+                var hiveString = hive == RegistryHive.LocalMachine ? "HKLM" : "HKCU";
+                _backupService?.BackupRegistryValue(hiveString, path, name);
+
                 using var baseKey = hive == RegistryHive.LocalMachine 
                     ? Registry.LocalMachine 
                     : Registry.CurrentUser;
@@ -278,6 +301,170 @@ namespace WindowsSetup.App.Services
                 _logger.LogWarning($"Could not set registry value {path}\\{name}: {ex.Message}");
             }
         }
+
+        #region Reset to Safe Defaults
+
+        public async Task ResetToSafeDefaults()
+        {
+            _logger.LogInfo("═══════════════════════════════════════════════════════════");
+            _logger.LogWarning("⚠️  DEPRECATED METHOD - USE 'RESTORE FROM BACKUP' INSTEAD! ⚠️");
+            _logger.LogInfo("═══════════════════════════════════════════════════════════");
+            _logger.LogInfo("");
+            _logger.LogInfo("This method uses generic 'safe defaults' which may not match");
+            _logger.LogInfo("your system's ORIGINAL configuration.");
+            _logger.LogInfo("");
+            _logger.LogInfo("For proper restoration, use:");
+            _logger.LogInfo("  1. Main Menu → Windows Optimization → Restore Previous Settings");
+            _logger.LogInfo("  2. Select your most recent backup");
+            _logger.LogInfo("  3. Let the system restore YOUR ACTUAL original values");
+            _logger.LogInfo("");
+            _logger.LogInfo("═══════════════════════════════════════════════════════════");
+            _logger.LogWarning("Proceeding with generic safe defaults anyway...");
+            _logger.LogInfo("═══════════════════════════════════════════════════════════");
+
+            try
+            {
+                // 1. Restore Network Settings (GENERIC - may not match your original)
+                _logger.LogInfo("🌐 Applying generic network defaults...");
+                await RestoreNetworkDefaults();
+
+                // 2. Re-enable Important Services
+                _logger.LogInfo("⚙️ Re-enabling important services...");
+                await RestoreServiceDefaults();
+
+                // 3. Restore Visual Effects
+                _logger.LogInfo("🎨 Restoring visual effects...");
+                await RestoreVisualDefaults();
+
+                // 4. Restore Windows Features
+                _logger.LogInfo("📦 Restoring Windows features...");
+                await RestoreFeatureDefaults();
+
+                _logger.LogInfo("═══════════════════════════════════════════════════════════");
+                _logger.LogSuccess("✅ Generic safe defaults applied!");
+                _logger.LogWarning("⚠️ IMPORTANT: These are NOT your original settings!");
+                _logger.LogWarning("⚠️ Use 'Restore from Backup' for proper restoration!");
+                _logger.LogWarning("⚠️ A REBOOT is REQUIRED for all changes to take effect!");
+                _logger.LogInfo("═══════════════════════════════════════════════════════════");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error during reset: {ex.Message}");
+                throw;
+            }
+        }
+
+        private async Task RestoreNetworkDefaults()
+        {
+            try
+            {
+                _logger.LogWarning("   ⚠️  Applying GENERIC defaults (not your originals!)");
+                
+                // Reset TCP/IP settings to Windows defaults
+                await _commandRunner.RunCommandAsync("netsh", "int tcp reset");
+                await _commandRunner.RunCommandAsync("netsh", "int ip reset");
+                
+                // Flush DNS
+                await _commandRunner.RunCommandAsync("ipconfig", "/flushdns");
+                
+                // Reset Winsock
+                await _commandRunner.RunCommandAsync("netsh", "winsock reset");
+                
+                // Reset DNS to DHCP (automatic)
+                await _commandRunner.RunCommandAsync("powershell", 
+                    "-Command \"Get-NetAdapter | Where-Object {$_.Status -eq 'Up'} | Set-DnsClientServerAddress -ResetServerAddresses\"");
+                
+                _logger.LogInfo("   ✅ Generic network defaults applied");
+                _logger.LogWarning("   ⚠️  Your original DNS servers were NOT restored!");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning($"   ⚠️ Some network settings couldn't be restored: {ex.Message}");
+            }
+        }
+
+        private async Task RestoreServiceDefaults()
+        {
+            var services = new Dictionary<string, string>
+            {
+                { "WSearch", "Delayed Auto" },       // Windows Search
+                { "SysMain", "Auto" },               // Superfetch
+                { "Spooler", "Auto" },               // Print Spooler
+                { "WinDefend", "Auto" },             // Windows Defender
+                { "mpssvc", "Auto" },                // Windows Firewall
+                { "Fax", "Manual" },                 // Fax
+                { "wisvc", "Manual" },               // Windows Insider Service
+                { "DiagTrack", "Auto" },             // Diagnostics
+                { "dmwappushservice", "Auto" }       // WAP Push
+            };
+
+            foreach (var service in services)
+            {
+                try
+                {
+                    var startType = service.Value == "Auto" ? "auto" : 
+                                   service.Value == "Delayed Auto" ? "delayed-auto" : "demand";
+                    await _commandRunner.RunCommandAsync("sc", $"config {service.Key} start={startType}");
+                    _logger.LogInfo($"   ✅ {service.Key} → {service.Value}");
+                }
+                catch
+                {
+                    _logger.LogWarning($"   ⚠️ Couldn't restore {service.Key}");
+                }
+            }
+        }
+
+        private async Task RestoreVisualDefaults()
+        {
+            try
+            {
+                // Enable transparency
+                SetRegistryValue(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize", 
+                    "EnableTransparency", 1, RegistryValueKind.DWord);
+
+                // Enable animations
+                SetRegistryValue(@"Control Panel\Desktop\WindowMetrics", 
+                    "MinAnimate", "1", RegistryValueKind.String);
+
+                // Restore visual effects (best appearance)
+                SetRegistryValue(@"Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects", 
+                    "VisualFXSetting", 2, RegistryValueKind.DWord);
+
+                await Task.CompletedTask;
+                _logger.LogSuccess("   ✅ Visual effects restored");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning($"   ⚠️ Some visual settings couldn't be restored: {ex.Message}");
+            }
+        }
+
+        private async Task RestoreFeatureDefaults()
+        {
+            try
+            {
+                // Re-enable Windows Search in Start Menu
+                SetRegistryValue(@"SOFTWARE\Policies\Microsoft\Windows\Windows Search", 
+                    "AllowCortana", 1, RegistryValueKind.DWord, RegistryHive.LocalMachine);
+
+                // Enable background apps
+                SetRegistryValue(@"Software\Microsoft\Windows\CurrentVersion\BackgroundAccessApplications", 
+                    "GlobalUserDisabled", 0, RegistryValueKind.DWord);
+
+                // Enable startup programs check
+                SetRegistryValue(@"Software\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\Run", 
+                    "Enabled", 1, RegistryValueKind.DWord);
+
+                await Task.CompletedTask;
+                _logger.LogSuccess("   ✅ Windows features restored");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning($"   ⚠️ Some features couldn't be restored: {ex.Message}");
+            }
+        }
+
+        #endregion
     }
 }
 

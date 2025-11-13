@@ -22,7 +22,7 @@ namespace WindowsSetup.App.Views
             UpdateSelectedCount();
             
             // Add checkbox change handlers
-            foreach (var checkbox in FindVisualChildren<CheckBox>(this))
+            foreach (var checkbox in FindVisualChildren<CheckBox>(this).Where(cb => cb.Name != "ChkCreateRestorePoint"))
             {
                 checkbox.Checked += OnCheckboxChanged;
                 checkbox.Unchecked += OnCheckboxChanged;
@@ -36,316 +36,133 @@ namespace WindowsSetup.App.Views
 
         private void UpdateSelectedCount()
         {
-            int count = FindVisualChildren<CheckBox>(this).Count(cb => cb.IsChecked == true);
-            if (SelectedCountText != null)
+            int count = FindVisualChildren<CheckBox>(this)
+                .Where(cb => cb.Name != "ChkCreateRestorePoint" && cb.IsChecked == true)
+                .Count();
+            
+            if (SelectionCount != null)
             {
-                SelectedCountText.Text = $"{count} optimizations selected";
+                SelectionCount.Text = $"{count} optimization{(count != 1 ? "s" : "")} selected";
             }
         }
 
         #region Preset Buttons
 
-        private void Recommended_Click(object sender, RoutedEventArgs e)
+        private void RecommendedSafe_Click(object sender, RoutedEventArgs e)
         {
-            // Performance (safe options)
+            // Select all safe optimizations
             OptPowerPlan.IsChecked = true;
             OptMouseAcceleration.IsChecked = true;
-            OptVisualEffects.IsChecked = true;
-            OptExplorer.IsChecked = true;
-            OptPageFile.IsChecked = false; // User preference
-            OptBackgroundApps.IsChecked = true;
-            OptTransparency.IsChecked = true;
-            OptAnimations.IsChecked = false;
-            OptStartup.IsChecked = false;
-
-            // Privacy
+            
             OptTelemetry.IsChecked = true;
             OptCortana.IsChecked = true;
-            OptAdvertising.IsChecked = true;
-            OptLocation.IsChecked = true;
+            OptAdvertisingId.IsChecked = true;
+            OptLocationTracking.IsChecked = true;
             OptDiagnostics.IsChecked = true;
-            OptActivityHistory.IsChecked = true;
-            OptWebSearch.IsChecked = true;
-
-            // Services (conservative)
-            OptPrintSpooler.IsChecked = false;
-            OptFaxService.IsChecked = false;
-            OptWindowsSearch.IsChecked = false;
-            OptSuperfetch.IsChecked = false;
-            OptWindowsUpdate.IsChecked = false;
-
-            // Gaming (moderate)
+            
             OptGameMode.IsChecked = true;
-            OptGameBar.IsChecked = false;
+            OptGameBar.IsChecked = true;
             OptGameDVR.IsChecked = true;
-            OptHardwareAcceleratedGPU.IsChecked = true;
-            OptFullscreenOptimizations.IsChecked = false;
-            OptCPUScheduling.IsChecked = false;
-            OptNagleAlgorithm.IsChecked = false;
-
-            // Network (safe)
-            OptTCPIP.IsChecked = false;
-            OptDNS.IsChecked = true;
-            OptNetworkThrottling.IsChecked = true;
-            OptNetworkAdapter.IsChecked = false;
-            OptLargeSendOffload.IsChecked = false;
-
-            // Debloat
-            OptCleanTempFiles.IsChecked = true;
-            OptRemoveBloatware.IsChecked = false; // User decision
-            OptDisableWidgets.IsChecked = true;
-            OptRemoveCoPilot.IsChecked = false;
-            OptDisableChat.IsChecked = true;
-            OptEmptyRecycleBin.IsChecked = false;
-            OptRemoveWindowsOld.IsChecked = false;
-
-            // Storage
-            OptSearchIndexing.IsChecked = false;
-            OptSSD.IsChecked = true;
-            OptSystemRestore.IsChecked = false;
-            OptCompactOS.IsChecked = false;
-            OptPrefetch.IsChecked = false;
-
-            // CPU & Memory
-            OptCoreParking.IsChecked = false;
-            OptProcessorScheduling.IsChecked = true;
-            OptMemoryManagement.IsChecked = true;
-            OptWriteCache.IsChecked = false;
-            OptSpectreMeltdown.IsChecked = false; // DANGEROUS
-
-            // UI Tweaks
-            OptShowFileExtensions.IsChecked = true;
-            OptShowHiddenFiles.IsChecked = false;
-            OptLockScreen.IsChecked = false;
-            OptActionCenter.IsChecked = false;
-            OptClassicContextMenu.IsChecked = false;
-            OptTaskbarLeft.IsChecked = false;
-            OptSnapAssist.IsChecked = false;
-
-            // Advanced
-            OptCreateRestorePoint.IsChecked = true; // IMPORTANT
-            OptDisableOneDrive.IsChecked = false;
-            OptDisableHibernation.IsChecked = false;
-            OptFastStartup.IsChecked = false;
-            OptRemoteAssistance.IsChecked = true;
-            OptErrorReporting.IsChecked = true;
-
-            UpdateSelectedCount();
-        }
-
-        private void Gaming_Click(object sender, RoutedEventArgs e)
-        {
-            // Performance (aggressive)
-            OptPowerPlan.IsChecked = true;
-            OptMouseAcceleration.IsChecked = true;
-            OptVisualEffects.IsChecked = true;
-            OptExplorer.IsChecked = true;
-            OptPageFile.IsChecked = true;
-            OptBackgroundApps.IsChecked = true;
-            OptTransparency.IsChecked = true;
-            OptAnimations.IsChecked = true;
-            OptStartup.IsChecked = true;
-
-            // Privacy
-            OptTelemetry.IsChecked = true;
-            OptCortana.IsChecked = true;
-            OptAdvertising.IsChecked = true;
-            OptLocation.IsChecked = true;
-            OptDiagnostics.IsChecked = true;
-            OptActivityHistory.IsChecked = true;
-            OptWebSearch.IsChecked = true;
-
-            // Services (disable non-essential)
-            OptPrintSpooler.IsChecked = true;
-            OptFaxService.IsChecked = true;
-            OptWindowsSearch.IsChecked = true;
-            OptSuperfetch.IsChecked = true;
-            OptWindowsUpdate.IsChecked = false;
-
-            // Gaming (ALL)
-            OptGameMode.IsChecked = true;
-            OptGameBar.IsChecked = true; // Some want it
-            OptGameDVR.IsChecked = true;
-            OptHardwareAcceleratedGPU.IsChecked = true;
-            OptFullscreenOptimizations.IsChecked = true;
-            OptCPUScheduling.IsChecked = true;
-            OptNagleAlgorithm.IsChecked = true;
-
-            // Network (gaming optimized)
-            OptTCPIP.IsChecked = true;
-            OptDNS.IsChecked = true;
-            OptNetworkThrottling.IsChecked = true;
-            OptNetworkAdapter.IsChecked = true;
-            OptLargeSendOffload.IsChecked = true;
-
-            // Debloat
-            OptCleanTempFiles.IsChecked = true;
-            OptRemoveBloatware.IsChecked = true;
-            OptDisableWidgets.IsChecked = true;
-            OptRemoveCoPilot.IsChecked = true;
-            OptDisableChat.IsChecked = true;
-            OptEmptyRecycleBin.IsChecked = false;
-            OptRemoveWindowsOld.IsChecked = false;
-
-            // Storage
-            OptSearchIndexing.IsChecked = true;
-            OptSSD.IsChecked = true;
-            OptSystemRestore.IsChecked = false;
-            OptCompactOS.IsChecked = false;
-            OptPrefetch.IsChecked = true;
-
-            // CPU & Memory (gaming)
-            OptCoreParking.IsChecked = true;
-            OptProcessorScheduling.IsChecked = true;
-            OptMemoryManagement.IsChecked = true;
-            OptWriteCache.IsChecked = true;
-            OptSpectreMeltdown.IsChecked = false; // Still dangerous
-
-            // UI Tweaks
+            
             OptShowFileExtensions.IsChecked = true;
             OptShowHiddenFiles.IsChecked = true;
-            OptLockScreen.IsChecked = true;
-            OptActionCenter.IsChecked = true;
-            OptClassicContextMenu.IsChecked = false;
-            OptTaskbarLeft.IsChecked = false;
-            OptSnapAssist.IsChecked = true;
-
-            // Advanced
-            OptCreateRestorePoint.IsChecked = true;
-            OptDisableOneDrive.IsChecked = false;
-            OptDisableHibernation.IsChecked = false;
-            OptFastStartup.IsChecked = true;
-            OptRemoteAssistance.IsChecked = true;
-            OptErrorReporting.IsChecked = true;
-
-            UpdateSelectedCount();
-        }
-
-        private void MaxPerformance_Click(object sender, RoutedEventArgs e)
-        {
-            // Select ALL performance options (EXPERT MODE)
-            SelectAll_Click(sender, e);
             
-            // Uncheck only the dangerous ones
-            OptSpectreMeltdown.IsChecked = false; // Security risk
-            OptSystemRestore.IsChecked = false; // Keep restore
-            OptEmptyRecycleBin.IsChecked = false; // User data
-            OptRemoveWindowsOld.IsChecked = false; // User data
+            OptCleanTemp.IsChecked = true;
             
             UpdateSelectedCount();
-        }
-
-        #endregion
-
-        #region Select/Deselect
-
-        private void SelectAll_Click(object sender, RoutedEventArgs e)
-        {
-            SetAllCheckboxes(true);
         }
 
         private void DeselectAll_Click(object sender, RoutedEventArgs e)
         {
-            SetAllCheckboxes(false);
-        }
-
-        private void SetAllCheckboxes(bool value)
-        {
-            foreach (var checkbox in FindVisualChildren<CheckBox>(this))
+            foreach (var checkbox in FindVisualChildren<CheckBox>(this).Where(cb => cb.Name != "ChkCreateRestorePoint"))
             {
-                checkbox.IsChecked = value;
+                checkbox.IsChecked = false;
             }
             UpdateSelectedCount();
         }
 
         #endregion
 
-        #region Apply/Cancel
+        #region Apply & Cancel
+
+        private void Apply_Click(object sender, RoutedEventArgs e)
+        {
+            // Map UI checkboxes to Settings model (ONLY SAFE OPTIONS)
+            Settings.HighPerformancePowerPlan = OptPowerPlan.IsChecked ?? false;
+            Settings.DisableMouseAcceleration = OptMouseAcceleration.IsChecked ?? false;
+            
+            Settings.DisableTelemetry = OptTelemetry.IsChecked ?? false;
+            Settings.DisableCortana = OptCortana.IsChecked ?? false;
+            Settings.DisableAdvertisingId = OptAdvertisingId.IsChecked ?? false;
+            Settings.DisableLocationTracking = OptLocationTracking.IsChecked ?? false;
+            Settings.DisableDiagnostics = OptDiagnostics.IsChecked ?? false;
+            
+            Settings.EnableGameMode = OptGameMode.IsChecked ?? false;
+            Settings.DisableGameBar = OptGameBar.IsChecked ?? false;
+            Settings.DisableGameDVR = OptGameDVR.IsChecked ?? false;
+            
+            Settings.ShowFileExtensions = OptShowFileExtensions.IsChecked ?? false;
+            Settings.ShowHiddenFiles = OptShowHiddenFiles.IsChecked ?? false;
+            
+            Settings.CleanTempFiles = OptCleanTemp.IsChecked ?? false;
+            
+            Settings.CreateRestorePoint = ChkCreateRestorePoint.IsChecked ?? true;
+
+            // Set all risky options to FALSE (ensure they're never applied)
+            Settings.OptimizeVisualEffects = false;
+            Settings.OptimizeExplorer = false;
+            Settings.DisableStartupPrograms = false;
+            Settings.OptimizePageFile = false;
+            Settings.DisableBackgroundApps = false;
+            Settings.DisableTransparency = false;
+            Settings.DisableAnimations = false;
+            Settings.DisableActivityHistory = false;
+            Settings.DisableWebSearch = false;
+            Settings.DisableBiometrics = false;
+            Settings.DisableCameraAccess = false;
+            Settings.DisablePrintSpooler = false;
+            Settings.DisableFax = false;
+            Settings.DisableWindowsSearch = false;
+            Settings.DisableSuperfetch = false;
+            Settings.SetWindowsUpdateManual = false;
+            Settings.DisableWindowsDefender = false;
+            Settings.DisableFirewall = false;
+            Settings.DisableUAC = false;
+            Settings.DisableSmartScreen = false;
+            Settings.EnableHardwareAcceleratedGPU = false;
+            Settings.DisableFullscreenOptimizations = false;
+            Settings.OptimizeCPUScheduling = false;
+            Settings.DisableNagleAlgorithm = false;
+            Settings.OptimizeTCPIP = false;
+            Settings.DisableLargeSendOffload = false;
+            Settings.OptimizeDNS = false;
+            Settings.DisableNetworkThrottling = false;
+            Settings.OptimizeNetworkAdapter = false;
+            Settings.EmptyRecycleBin = false;
+            Settings.DeleteWindowsOld = false;
+            Settings.CleanDownloads = false;
+            Settings.RemoveBloatwareApps = false;
+            Settings.DisableWidgets = false;
+            Settings.DisableNewsInterests = false;
+            Settings.RemoveCoPilot = false;
+            Settings.OptimizeSSD = false;
+            Settings.DisablePrefetch = false;
+            Settings.OptimizeMemoryManagement = false;
+            Settings.DisableHibernation = false;
+            Settings.DisableFastStartup = false;
+            Settings.DisableOneDrive = false;
+            Settings.DisableLockScreen = false;
+            Settings.DisableActionCenter = false;
+
+            WasApplied = true;
+            DialogResult = true;
+            Close();
+        }
 
         private void Cancel_Click(object sender, RoutedEventArgs e)
         {
             WasApplied = false;
-            Close();
-        }
-
-        private void Apply_Click(object sender, RoutedEventArgs e)
-        {
-            // Collect settings from ALL checkboxes
-            Settings = new OptimizationSettings
-            {
-                // Performance
-                HighPerformancePowerPlan = OptPowerPlan.IsChecked ?? false,
-                DisableMouseAcceleration = OptMouseAcceleration.IsChecked ?? false,
-                OptimizeVisualEffects = OptVisualEffects.IsChecked ?? false,
-                OptimizeExplorer = OptExplorer.IsChecked ?? false,
-                DisableStartupPrograms = OptStartup.IsChecked ?? false,
-                OptimizePageFile = OptPageFile.IsChecked ?? false,
-                DisableBackgroundApps = OptBackgroundApps.IsChecked ?? false,
-                DisableTransparency = OptTransparency.IsChecked ?? false,
-                DisableAnimations = OptAnimations.IsChecked ?? false,
-
-                // Privacy & Telemetry
-                DisableTelemetry = OptTelemetry.IsChecked ?? false,
-                DisableCortana = OptCortana.IsChecked ?? false,
-                DisableAdvertisingId = OptAdvertising.IsChecked ?? false,
-                DisableLocationTracking = OptLocation.IsChecked ?? false,
-                DisableDiagnostics = OptDiagnostics.IsChecked ?? false,
-                DisableActivityHistory = OptActivityHistory.IsChecked ?? false,
-                DisableWebSearch = OptWebSearch.IsChecked ?? false,
-
-                // Services
-                DisablePrintSpooler = OptPrintSpooler.IsChecked ?? false,
-                DisableFax = OptFaxService.IsChecked ?? false,
-                DisableWindowsSearch = OptWindowsSearch.IsChecked ?? false,
-                DisableSuperfetch = OptSuperfetch.IsChecked ?? false,
-                SetWindowsUpdateManual = OptWindowsUpdate.IsChecked ?? false,
-
-                // Gaming
-                EnableGameMode = OptGameMode.IsChecked ?? false,
-                DisableGameBar = OptGameBar.IsChecked ?? false,
-                DisableGameDVR = OptGameDVR.IsChecked ?? false,
-                EnableHardwareAcceleratedGPU = OptHardwareAcceleratedGPU.IsChecked ?? false,
-                DisableFullscreenOptimizations = OptFullscreenOptimizations.IsChecked ?? false,
-                OptimizeCPUScheduling = OptCPUScheduling.IsChecked ?? false,
-                DisableNagleAlgorithm = OptNagleAlgorithm.IsChecked ?? false,
-
-                // Network
-                OptimizeTCPIP = OptTCPIP.IsChecked ?? false,
-                OptimizeDNS = OptDNS.IsChecked ?? false,
-                DisableNetworkThrottling = OptNetworkThrottling.IsChecked ?? false,
-
-                // Debloat & Cleanup
-                CleanTempFiles = OptCleanTempFiles.IsChecked ?? false,
-                EmptyRecycleBin = OptEmptyRecycleBin.IsChecked ?? false,
-                DeleteWindowsOld = OptRemoveWindowsOld.IsChecked ?? false,
-                RemoveBloatwareApps = OptRemoveBloatware.IsChecked ?? false,
-                DisableWidgets = OptDisableWidgets.IsChecked ?? false,
-                RemoveCoPilot = OptRemoveCoPilot.IsChecked ?? false,
-
-                // Storage & Memory
-                DisableSearchIndexing = OptSearchIndexing.IsChecked ?? false,
-                OptimizeSSD = OptSSD.IsChecked ?? false,
-
-                // CPU & Memory
-                DisableCoreParking = OptCoreParking.IsChecked ?? false,
-                DisableSpectreMeltdown = OptSpectreMeltdown.IsChecked ?? false,
-                OptimizeProcessorScheduling = OptProcessorScheduling.IsChecked ?? false,
-
-                // UI Tweaks
-                ShowFileExtensions = OptShowFileExtensions.IsChecked ?? false,
-                DisableLockScreen = OptLockScreen.IsChecked ?? false,
-                ClassicContextMenu = OptClassicContextMenu.IsChecked ?? false,
-
-                // Advanced
-                CreateRestorePoint = OptCreateRestorePoint.IsChecked ?? false,
-                DisableOneDrive = OptDisableOneDrive.IsChecked ?? false,
-                DisableHibernation = OptDisableHibernation.IsChecked ?? false,
-                DisableFastStartup = OptFastStartup.IsChecked ?? false,
-                DisableRemoteAssistance = OptRemoteAssistance.IsChecked ?? false,
-                DisableErrorReporting = OptErrorReporting.IsChecked ?? false
-            };
-
-            WasApplied = true;
+            DialogResult = false;
             Close();
         }
 
@@ -353,25 +170,22 @@ namespace WindowsSetup.App.Views
 
         #region Helper Methods
 
-        private static System.Collections.Generic.IEnumerable<T> FindVisualChildren<T>(DependencyObject? depObj) where T : DependencyObject
+        private static System.Collections.Generic.IEnumerable<T> FindVisualChildren<T>(DependencyObject depObj) where T : DependencyObject
         {
-            if (depObj != null)
-            {
-                for (int i = 0; i < VisualTreeHelper.GetChildrenCount(depObj); i++)
-                {
-                    DependencyObject? child = VisualTreeHelper.GetChild(depObj, i);
-                    if (child != null && child is T t)
-                    {
-                        yield return t;
-                    }
+            if (depObj == null) yield break;
 
-                    if (child != null)
-                    {
-                        foreach (T childOfChild in FindVisualChildren<T>(child))
-                        {
-                            yield return childOfChild;
-                        }
-                    }
+            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(depObj); i++)
+            {
+                var child = VisualTreeHelper.GetChild(depObj, i);
+
+                if (child is T t)
+                {
+                    yield return t;
+                }
+
+                foreach (var childOfChild in FindVisualChildren<T>(child))
+                {
+                    yield return childOfChild;
                 }
             }
         }

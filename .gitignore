@@ -155,3 +155,5 @@ AdsPower-*.exe
 
 RELEASE_GUIDE.md
 release-config.json
+dev-utils
+Windows-Custom-ISO-Builder

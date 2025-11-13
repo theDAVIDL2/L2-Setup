@@ -148,6 +148,9 @@ namespace WindowsSetup.App.Services
             _logger.LogInfo("Disabling Nagle's Algorithm (lower network latency for gaming)...");
             try
             {
+                // BACKUP FIRST - this is critical for network performance
+                await (_backupService?.BackupNetworkInterfaceSettings() ?? Task.CompletedTask);
+
                 var interfaces = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Services\Tcpip\Parameters\Interfaces");
                 if (interfaces != null)
                 {
@@ -181,6 +184,9 @@ namespace WindowsSetup.App.Services
             _logger.LogInfo("Optimizing TCP/IP stack...");
             try
             {
+                // BACKUP FIRST - critical for network functionality
+                await (_backupService?.BackupTcpIpSettings() ?? Task.CompletedTask);
+
                 await _commandRunner.RunCommandAsync("netsh", "int tcp set global chimney=enabled");
                 await _commandRunner.RunCommandAsync("netsh", "int tcp set global autotuninglevel=normal");
                 await _commandRunner.RunCommandAsync("netsh", "int tcp set global congestionprovider=ctcp");
@@ -199,6 +205,9 @@ namespace WindowsSetup.App.Services
             _logger.LogInfo("Setting Cloudflare DNS (1.1.1.1)...");
             try
             {
+                // BACKUP FIRST - DNS changes can break internet connectivity
+                await (_backupService?.BackupDnsSettings() ?? Task.CompletedTask);
+
                 await _commandRunner.RunCommandAsync("powershell", "-Command \"Get-NetAdapter | Where-Object {$_.Status -eq 'Up'} | Set-DnsClientServerAddress -ServerAddresses ('1.1.1.1','1.0.0.1')\"");
                 _logger.LogSuccess("DNS set to Cloudflare (1.1.1.1)");
             }
@@ -213,7 +222,9 @@ namespace WindowsSetup.App.Services
             _logger.LogInfo("Disabling network throttling...");
             try
             {
-                SetRegistryValue(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile", "NetworkThrottlingIndex", unchecked((int)0xFFFFFFFF), RegistryValueKind.DWord);
+                // BACKUP FIRST - including NetworkThrottlingIndex
+                // This is handled by SetRegistryValue which calls backup
+                SetRegistryValue(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile", "NetworkThrottlingIndex", unchecked((int)0xFFFFFFFF), RegistryValueKind.DWord, RegistryHive.LocalMachine);
                 _logger.LogSuccess("Network throttling disabled");
             }
             catch (Exception ex)

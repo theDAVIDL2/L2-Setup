@@ -6,26 +6,101 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ---
 
+## [1.1.1] - 2025-11-13
+
+### 🐛 CRITICAL FIX: Network Optimization Restore
+**This fixes the browser slowness issue after optimization restore!**
+
+#### Fixed
+- **Network settings now properly backed up and restored**
+  - DNS configurations are now backed up before changes
+  - Nagle's Algorithm settings (TcpAckFrequency, TCPNoDelay) now backed up
+  - TCP/IP stack settings (netsh commands) now backed up
+  - Network throttling index now uses original value, not hardcoded default
+  
+- **Browser slowness after restore** - Root cause identified and fixed
+  - DNS was changed to Cloudflare (1.1.1.1) without backing up original
+  - Network interface settings were modified in HKLM without backup
+  - Restore used hardcoded "safe defaults" instead of original values
+  
+#### Added
+- `NetworkSettingBackupEntry` - Tracks network interface registry changes
+- `DnsBackupEntry` - Backs up DNS server configurations per adapter
+- `TcpIpBackupEntry` - Backs up TCP/IP stack settings
+- `BackupNetworkInterfaceSettings()` method
+- `BackupDnsSettings()` method  
+- `BackupTcpIpSettings()` method
+- Comprehensive network restore methods
+- Documentation: `docs/NETWORK_OPTIMIZATION_FIX.md` - Full explanation and recovery guide
+
+#### Changed
+- All network optimizations now call backup before modification
+- `ResetToSafeDefaults()` now warns about using backup restore instead
+- Backup save log now includes network, DNS, and TCP/IP counts
+- Restore completion message now emphasizes restart requirement for network changes
+
+#### Important Notes for Users
+- **If experiencing slow browser NOW**: See `docs/NETWORK_OPTIMIZATION_FIX.md`
+- Old backups don't contain network settings (system limitation)
+- New optimizations will properly backup everything
+- Always restart after network restore for changes to take effect
+
+---
+
 ## [Unreleased]
 
-### ✨ New Features
-- **50+ Enhanced Windows Optimizations** - Inspired by the best GitHub repos
-  - 🚀 Performance (9 tweaks): Background Apps, Transparency, Animations
-  - 🔒 Privacy & Telemetry (7 tweaks): Activity History, Web Search
-  - ⚙️ Services & Features (5 tweaks): Superfetch, Windows Search control
-  - 🎮 Gaming Optimizations (7 tweaks): Fullscreen Opt, CPU Scheduling, Nagle Algorithm
-  - 🌐 Network Optimizations (5 tweaks): TCP/IP Stack, Cloudflare DNS, Throttling
-  - 🗑️ Debloat & Cleanup (7 tweaks): Remove 27 Bloatware Apps, Widgets, CoPilot
-  - 💾 Storage & Memory (5 tweaks): SSD TRIM, Search Indexing, Compact OS
-  - 🖥️ CPU & Memory (5 tweaks): Core Parking, Spectre/Meltdown (EXPERT)
-  - 🎨 UI Tweaks (7 tweaks): Classic Context Menu, Lock Screen, Taskbar
-  - ⚡ Advanced & Expert (6 tweaks): Fast Startup, Remote Assistance, Error Reporting
+### ⚠️ IMPORTANT: Optimization Stability Changes (Latest)
 
-- **Completely Redesigned Optimization UI**
-  - Modern expandable sections for each optimization category
-  - Quick presets: Recommended (Safe), Gaming Optimized, Max Performance
-  - Real-time optimization counter
-  - Color-coded options (Green = NEW, Red = DANGEROUS)
+**Most Windows optimizations have been DISABLED by default due to stability concerns.**
+
+#### ✅ What's ENABLED (Safe & Stable):
+- ✅ **Power Management** - High Performance power plan
+- ✅ **Mouse Settings** - Disable mouse acceleration  
+- ✅ **Privacy & Telemetry** (5/7 tweaks) - Disable Windows telemetry, Cortana, advertising ID, location tracking, diagnostics
+- ✅ **Gaming Basics** (3/7 tweaks) - Game Mode, disable Game Bar/DVR
+- ✅ **UI Tweaks** (2/7 tweaks) - Show file extensions, show hidden files
+- ✅ **Cleanup** - Temporary files cleanup
+
+#### ⚠️ What's DISABLED by Default (Unstable/Risky):
+- ⚠️ **Visual Effects** - Can affect UI appearance
+- ⚠️ **Network Optimizations** - All TCP/IP, DNS, and network tweaks (can break connectivity)
+- ⚠️ **CPU/Memory** - Core parking, scheduling, memory management
+- ⚠️ **Storage** - SSD optimization, indexing, prefetch
+- ⚠️ **Services** - All service modifications (Print Spooler, Windows Search, etc.)
+- ⚠️ **Debloat** - App removal, widgets, CoPilot (can remove needed components)
+- ⚠️ **Advanced Tweaks** - OneDrive, hibernation, fast startup
+
+#### 📋 Reason for Changes:
+Advanced system optimizations can cause:
+- System instability and crashes
+- Network connectivity issues
+- Application compatibility problems
+- Difficult-to-diagnose issues requiring troubleshooting
+
+**Focus:** Prioritizing reliability and user experience over aggressive optimization.
+
+💡 **System restore points are ALWAYS created before applying optimizations.**
+
+### ✨ New Features (Prior Updates)
+- **50+ Enhanced Windows Optimizations** - Available but disabled by default
+  - 🚀 Performance (2 safe / 7 disabled)
+  - 🔒 Privacy & Telemetry (5 safe / 2 disabled)
+  - ⚙️ Services & Features (0 safe / 5 disabled)
+  - 🎮 Gaming Optimizations (3 safe / 4 disabled)
+  - 🌐 Network Optimizations (0 safe / 5 disabled - all disabled)
+  - 🗑️ Debloat & Cleanup (1 safe / 6 disabled)
+  - 💾 Storage & Memory (0 safe / 5 disabled - all disabled)
+  - 🖥️ CPU & Memory (0 safe / 5 disabled - all disabled)
+  - 🎨 UI Tweaks (2 safe / 5 disabled)
+  - ⚡ Advanced & Expert (1 safe / 6 disabled)
+
+- **Optimization UI with Stability Warnings**
+  - ⚠️ **Prominent stability notice** at the top
+  - Modern expandable sections showing safe/disabled count
+  - ✅ Green indicators for safe options
+  - ⚠️ Gray/disabled styling for risky options
+  - Only "Recommended (Safe)" preset remains (Gaming/Max Performance removed)
+  - Enhanced warnings and tooltips explaining risks
   - Select All / Deselect All buttons
 
 - **Improved Windows Activation System**
