@@ -96,16 +96,17 @@ echo  [3] 📦 Build Release (Production)
 echo  [4] 🎁 Create Installer (Inno Setup)
 echo  [5] 🚀 Full Release (Build + Installer + Push)
 echo  [6] 🏷️  Create GitHub Release Tag
-echo  [7] 📊 Check Project Status
-echo  [8] 🧹 Clean Build Artifacts
-echo  [9] 🔧 Advanced Options
-echo  [10] ⚙️  Edit Configuration
+echo  [7] 🤖 Automated Release (GitHub Actions)
+echo  [8] 📊 Check Project Status
+echo  [9] 🧹 Clean Build Artifacts
+echo  [10] 🔧 Advanced Options
+echo  [11] ⚙️  Edit Configuration
 echo  [0] ❌ Exit
 echo.
 echo ════════════════════════════════════════════════════════════
 echo.
 
-set /p choice="Enter your choice (0-10): "
+set /p choice="Enter your choice (0-11): "
 
 if "%choice%"=="1" goto QUICK_PUSH
 if "%choice%"=="2" goto BUILD_DEBUG
@@ -113,10 +114,11 @@ if "%choice%"=="3" goto BUILD_RELEASE
 if "%choice%"=="4" goto CREATE_INSTALLER
 if "%choice%"=="5" goto FULL_RELEASE
 if "%choice%"=="6" goto CREATE_RELEASE_TAG
-if "%choice%"=="7" goto CHECK_STATUS
-if "%choice%"=="8" goto CLEAN_BUILD
-if "%choice%"=="9" goto ADVANCED_OPTIONS
-if "%choice%"=="10" goto EDIT_CONFIG
+if "%choice%"=="7" goto AUTOMATED_RELEASE
+if "%choice%"=="8" goto CHECK_STATUS
+if "%choice%"=="9" goto CLEAN_BUILD
+if "%choice%"=="10" goto ADVANCED_OPTIONS
+if "%choice%"=="11" goto EDIT_CONFIG
 if "%choice%"=="0" goto EXIT
 echo Invalid choice. Please try again.
 timeout /t 2 >nul
@@ -767,6 +769,196 @@ echo    4. Publish the release
 echo.
 
 call :LOG "Release tag created successfully: %tag_version%"
+pause
+goto MENU
+
+:: ================================================================
+:: AUTOMATED RELEASE (GitHub Actions)
+:: ================================================================
+:AUTOMATED_RELEASE
+cls
+call :LOG "Automated Release started"
+echo.
+echo ╔════════════════════════════════════════════════════════════╗
+echo ║        🤖 Automated Release (GitHub Actions) 🤖            ║
+echo ╚════════════════════════════════════════════════════════════╝
+echo.
+echo 📝 This will create a release using GitHub Actions workflow.
+echo.
+echo ⚙️  How it works:
+echo    1. Creates a version tag (e.g., v%PROJECT_VERSION%)
+echo    2. Pushes the tag to GitHub
+echo    3. GitHub Actions automatically:
+echo       • Builds the project
+echo       • Creates the installer
+echo       • Publishes the release
+echo       • Uploads both executable and installer
+echo.
+echo ════════════════════════════════════════════════════════════
+echo.
+
+call :CHECK_GIT
+if errorlevel 1 goto MENU
+
+:: Check if current branch is main/master
+for /f "usebackq delims=" %%i in (`git rev-parse --abbrev-ref HEAD`) do set "current_branch=%%i"
+if not "%current_branch%"=="%DEFAULT_BRANCH%" (
+    echo ⚠️  WARNING: You're on branch '%current_branch%'
+    echo    Releases should be created from '%DEFAULT_BRANCH%' branch.
+    echo.
+    set /p switch_branch="Switch to %DEFAULT_BRANCH% branch? (Y/N): "
+    if /i "!switch_branch!"=="Y" (
+        git checkout %DEFAULT_BRANCH%
+        if errorlevel 1 (
+            echo ❌ Failed to switch branch!
+            pause
+            goto MENU
+        )
+        git pull origin %DEFAULT_BRANCH%
+    ) else (
+        echo Continuing on current branch...
+    )
+    echo.
+)
+
+:: Check if there are uncommitted changes
+git diff --quiet
+if errorlevel 1 (
+    echo ⚠️  You have uncommitted changes!
+    echo.
+    set /p commit_now="Commit changes now? (Y/N): "
+    if /i "!commit_now!"=="Y" (
+        echo.
+        set /p commit_msg="Commit message: "
+        if not defined commit_msg set "commit_msg=Pre-release commit"
+        
+        git add .
+        git commit -m "!commit_msg!"
+        if errorlevel 1 (
+            echo ❌ Commit failed!
+            pause
+            goto MENU
+        )
+        
+        git push origin %current_branch%
+        if errorlevel 1 (
+            echo ❌ Push failed!
+            pause
+            goto MENU
+        )
+        echo ✅ Changes committed and pushed!
+        echo.
+    ) else (
+        echo ⚠️  Proceeding with uncommitted changes...
+        echo.
+    )
+)
+
+echo Enter release information:
+echo.
+set /p tag_version="Version tag (e.g., v%PROJECT_VERSION%): "
+if not defined tag_version set "tag_version=v%PROJECT_VERSION%"
+
+set /p tag_message="Release message: "
+if not defined tag_message set "tag_message=Release %tag_version%"
+
+echo.
+echo ════════════════════════════════════════════════════════════
+echo.
+echo 📋 Automated Release Summary:
+echo    🏷️  Tag: %tag_version%
+echo    📝 Message: %tag_message%
+echo    🌿 Branch: %current_branch%
+echo    🔗 Repository: %REPO_URL%
+echo.
+echo 🤖 What will happen:
+echo    1. Git tag created: %tag_version%
+echo    2. Tag pushed to GitHub
+echo    3. GitHub Actions workflow triggered
+echo    4. Automated build process starts
+echo    5. Release created with artifacts
+echo.
+set /p confirm="Start automated release? (Y/N): "
+if /i not "%confirm%"=="Y" (
+    call :LOG "Automated release cancelled"
+    goto MENU
+)
+
+echo.
+echo ════════════════════════════════════════════════════════════
+echo.
+echo 🏷️  Creating tag...
+call :LOG "Creating tag: %tag_version%"
+git tag -a "%tag_version%" -m "%tag_message%"
+if errorlevel 1 (
+    call :LOG "ERROR: Failed to create tag"
+    echo ❌ Failed to create tag!
+    echo.
+    echo 💡 Possible reasons:
+    echo    • Tag already exists
+    echo    • Invalid tag name
+    echo.
+    pause
+    goto MENU
+)
+echo    ✅ Tag created locally
+echo.
+
+echo 📤 Pushing tag to GitHub...
+call :LOG "Pushing tag to GitHub"
+git push origin "%tag_version%"
+if errorlevel 1 (
+    call :LOG "ERROR: Failed to push tag"
+    echo ❌ Failed to push tag to GitHub!
+    echo.
+    echo 💡 Possible reasons:
+    echo    • Network issue
+    echo    • Authentication problem
+    echo    • Remote tag already exists
+    echo.
+    echo Cleaning up local tag...
+    git tag -d "%tag_version%" >nul 2>&1
+    pause
+    goto MENU
+)
+
+call :LOG "Tag pushed successfully - GitHub Actions triggered"
+echo    ✅ Tag pushed successfully!
+echo.
+echo ════════════════════════════════════════════════════════════
+echo.
+echo 🎉 AUTOMATED RELEASE TRIGGERED!
+echo.
+echo 🤖 GitHub Actions is now building your release...
+echo.
+echo ⏱️  Expected time: 5-10 minutes
+echo.
+echo 📊 Monitor progress:
+echo    🔗 Actions: %REPO_URL%/actions
+echo.
+echo 📦 When complete, release will be available at:
+echo    🔗 Releases: %REPO_URL%/releases/tag/%tag_version%
+echo.
+echo 📥 The release will include:
+echo    • L2Setup-Installer-%tag_version%.exe (~49 MB)
+echo    • L2Setup-%tag_version%.exe (~166 MB)
+echo    • Release notes (auto-generated)
+echo.
+echo ════════════════════════════════════════════════════════════
+echo.
+echo 💡 Next steps:
+echo    1. Wait for GitHub Actions to complete (5-10 min)
+echo    2. Check %REPO_URL%/actions for status
+echo    3. Download and test the release artifacts
+echo    4. Update CHANGELOG.md if needed
+echo    5. Share the release link!
+echo.
+set /p open_actions="Open GitHub Actions page in browser? (Y/N): "
+if /i "%open_actions%"=="Y" (
+    start "" "%REPO_URL%/actions"
+)
+
+echo.
 pause
 goto MENU
 

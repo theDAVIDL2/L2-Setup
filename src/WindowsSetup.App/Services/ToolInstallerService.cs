@@ -43,8 +43,7 @@ namespace WindowsSetup.App.Services
                 new() { Name = "Git", WingetId = "Git.Git", Priority = 1, Essential = true },
                 new() { Name = "Python 3.13", WingetId = "Python.Python.3.13", Priority = 2, Essential = true },
                 new() { Name = "Node.js LTS", WingetId = "OpenJS.NodeJS.LTS", Priority = 3, Essential = true },
-                new() { Name = "Visual Studio Code", WingetId = "Microsoft.VisualStudioCode", Priority = 4, Essential = true },
-                new() { Name = "Brave Browser", WingetId = "Brave.Brave", Priority = 5, Essential = true }
+                new() { Name = "Visual Studio Code", WingetId = "Microsoft.VisualStudioCode", Priority = 4, Essential = true }
             };
 
             await InstallTools(essentialTools);

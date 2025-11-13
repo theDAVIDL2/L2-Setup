@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         Title="L2 Setup - Optimization Settings" 
-        Height="650" Width="800"
+        Height="750" Width="950"
         WindowStartupLocation="CenterScreen"
         Background="{DynamicResource MaterialDesignPaper}">
 
@@ -17,90 +17,175 @@
         <!-- Header -->
         <materialDesign:ColorZone Grid.Row="0" Mode="PrimaryMid" Padding="16">
             <StackPanel>
-                <TextBlock Text="L2 Setup - Optimization Settings" 
+                <TextBlock Text="L2 Setup - Windows Optimization Settings" 
                           Style="{StaticResource MaterialDesignHeadline5TextBlock}"
                           Foreground="White"/>
-                <TextBlock Text="Select which optimizations to apply to your system" 
+                <TextBlock Text="Select optimizations to apply - 50+ options available!" 
                           Style="{StaticResource MaterialDesignBody2TextBlock}"
                           Foreground="White" Opacity="0.8"/>
             </StackPanel>
         </materialDesign:ColorZone>
 
         <!-- Content -->
-        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Margin="20">
-            <StackPanel>
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Margin="10">
+            <StackPanel Margin="10">
                 
-                <!-- Quick Actions -->
-                <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
-                    <Button Content="Select All" Click="SelectAll_Click" Width="100" Margin="0,0,10,0"/>
-                    <Button Content="Deselect All" Click="DeselectAll_Click" Width="100" Margin="0,0,10,0"/>
-                    <Button Content="Recommended" Click="SelectRecommended_Click" Width="120"/>
-                </StackPanel>
+                <!-- Quick Presets -->
+                <materialDesign:Card Margin="0,0,0,16" Padding="16" Background="{DynamicResource MaterialDesignToolBarBackground}">
+                    <StackPanel>
+                        <TextBlock Text="⚡ Quick Presets" FontSize="16" FontWeight="Bold" Margin="0,0,0,10"/>
+                        <StackPanel Orientation="Horizontal">
+                            <Button x:Name="RecommendedButton" Content="Recommended (Safe)" Style="{StaticResource MaterialDesignRaisedButton}" Click="Recommended_Click" Margin="0,0,8,0" Background="#4CAF50"/>
+                            <Button x:Name="GamingButton" Content="Gaming Optimized" Style="{StaticResource MaterialDesignRaisedButton}" Click="Gaming_Click" Margin="0,0,8,0" Background="#FF9800"/>
+                            <Button x:Name="MaxPerformanceButton" Content="Max Performance" Style="{StaticResource MaterialDesignRaisedButton}" Click="MaxPerformance_Click" Margin="0,0,8,0" Background="#F44336"/>
+                            <Button x:Name="SelectAllButton" Content="Select All" Style="{StaticResource MaterialDesignFlatButton}" Click="SelectAll_Click" Margin="0,0,8,0"/>
+                            <Button x:Name="DeselectAllButton" Content="Deselect All" Style="{StaticResource MaterialDesignFlatButton}" Click="DeselectAll_Click"/>
+                        </StackPanel>
+                    </StackPanel>
+                </materialDesign:Card>
 
-                <!-- Performance Optimizations -->
-                <TextBlock Text="⚡ Performance Optimizations" FontSize="18" FontWeight="Bold" Margin="0,0,0,10"/>
-                <CheckBox x:Name="OptPower" Content="High Performance Power Plan" Margin="20,5,0,5" IsChecked="True"/>
-                <CheckBox x:Name="OptMouse" Content="Disable Mouse Acceleration" Margin="20,5,0,5" IsChecked="True"/>
-                <CheckBox x:Name="OptVisualEffects" Content="Optimize Visual Effects for Performance" Margin="20,5,0,5" IsChecked="True"/>
-                <CheckBox x:Name="OptExplorer" Content="Optimize File Explorer" Margin="20,5,0,5" IsChecked="True"/>
-                <CheckBox x:Name="OptStartup" Content="Disable Unnecessary Startup Programs" Margin="20,5,0,5" IsChecked="False"/>
-                <CheckBox x:Name="OptPageFile" Content="Optimize Virtual Memory (Page File)" Margin="20,5,0,5" IsChecked="False"/>
+                <!-- Performance Section -->
+                <Expander Header="🚀 PERFORMANCE OPTIMIZATIONS (9 tweaks)" IsExpanded="True" Margin="0,0,0,10">
+                    <StackPanel Margin="20,10">
+                        <CheckBox x:Name="OptPowerPlan" Content="High Performance Power Plan" Margin="0,5" IsChecked="True"/>
+                        <CheckBox x:Name="OptMouseAcceleration" Content="Disable Mouse Acceleration" Margin="0,5" IsChecked="True"/>
+                        <CheckBox x:Name="OptVisualEffects" Content="Optimize Visual Effects (Performance)" Margin="0,5" IsChecked="True"/>
+                        <CheckBox x:Name="OptExplorer" Content="Optimize File Explorer" Margin="0,5" IsChecked="True"/>
+                        <CheckBox x:Name="OptPageFile" Content="Optimize Virtual Memory (Page File)" Margin="0,5"/>
+                        <CheckBox x:Name="OptBackgroundApps" Content="Disable Background Apps" Margin="0,5" IsChecked="True" FontWeight="Bold" Foreground="#4CAF50"/>
+                        <CheckBox x:Name="OptTransparency" Content="Disable Transparency Effects" Margin="0,5" IsChecked="True" FontWeight="Bold" Foreground="#4CAF50"/>
+                        <CheckBox x:Name="OptAnimations" Content="Disable Windows Animations" Margin="0,5" IsChecked="True" FontWeight="Bold" Foreground="#4CAF50"/>
+                        <CheckBox x:Name="OptStartup" Content="Disable Unnecessary Startup Programs" Margin="0,5"/>
+                    </StackPanel>
+                </Expander>
 
-                <Separator Margin="0,15"/>
+                <!-- Privacy Section -->
+                <Expander Header="🔒 PRIVACY &amp; TELEMETRY (7 tweaks)" IsExpanded="True" Margin="0,0,0,10">
+                    <StackPanel Margin="20,10">
+                        <CheckBox x:Name="OptTelemetry" Content="Disable Windows Telemetry" Margin="0,5" IsChecked="True"/>
+                        <CheckBox x:Name="OptCortana" Content="Disable Cortana" Margin="0,5" IsChecked="True"/>
+                        <CheckBox x:Name="OptAdvertising" Content="Disable Advertising ID" Margin="0,5" IsChecked="True"/>
+                        <CheckBox x:Name="OptLocation" Content="Disable Location Tracking" Margin="0,5" IsChecked="True"/>
+                        <CheckBox x:Name="OptDiagnostics" Content="Disable Diagnostic Data Collection" Margin="0,5" IsChecked="True"/>
+                        <CheckBox x:Name="OptActivityHistory" Content="Disable Activity History" Margin="0,5" IsChecked="True" FontWeight="Bold" Foreground="#4CAF50"/>
+                        <CheckBox x:Name="OptWebSearch" Content="Disable Web Search in Start Menu" Margin="0,5" IsChecked="True" FontWeight="Bold" Foreground="#4CAF50"/>
+                    </StackPanel>
+                </Expander>
 
-                <!-- Privacy & Telemetry -->
-                <TextBlock Text="🔒 Privacy &amp; Telemetry" FontSize="18" FontWeight="Bold" Margin="0,10,0,10"/>
-                <CheckBox x:Name="OptTelemetry" Content="Disable Windows Telemetry" Margin="20,5,0,5" IsChecked="True"/>
-                <CheckBox x:Name="OptCortana" Content="Disable Cortana" Margin="20,5,0,5" IsChecked="True"/>
-                <CheckBox x:Name="OptAdvertising" Content="Disable Advertising ID" Margin="20,5,0,5" IsChecked="True"/>
-                <CheckBox x:Name="OptLocation" Content="Disable Location Tracking" Margin="20,5,0,5" IsChecked="True"/>
-                <CheckBox x:Name="OptDiagnostics" Content="Disable Diagnostic Data Collection" Margin="20,5,0,5" IsChecked="True"/>
+                <!-- Services Section -->
+                <Expander Header="⚙️ SERVICES &amp; FEATURES (5 tweaks)" Margin="0,0,0,10">
+                    <StackPanel Margin="20,10">
+                        <CheckBox x:Name="OptPrintSpooler" Content="Disable Print Spooler (if no printer)" Margin="0,5"/>
+                        <CheckBox x:Name="OptFaxService" Content="Disable Fax Service" Margin="0,5"/>
+                        <CheckBox x:Name="OptWindowsSearch" Content="Disable Windows Search (if not used)" Margin="0,5"/>
+                        <CheckBox x:Name="OptSuperfetch" Content="Disable Superfetch/SysMain" Margin="0,5"/>
+                        <CheckBox x:Name="OptWindowsUpdate" Content="Set Windows Update to Manual" Margin="0,5"/>
+                    </StackPanel>
+                </Expander>
 
-                <Separator Margin="0,15"/>
+                <!-- Gaming Section -->
+                <Expander Header="🎮 GAMING OPTIMIZATIONS (7 tweaks)" IsExpanded="True" Margin="0,0,0,10">
+                    <StackPanel Margin="20,10">
+                        <CheckBox x:Name="OptGameMode" Content="Enable Game Mode" Margin="0,5" IsChecked="True"/>
+                        <CheckBox x:Name="OptGameBar" Content="Disable Game Bar" Margin="0,5" IsChecked="True"/>
+                        <CheckBox x:Name="OptGameDVR" Content="Disable Game DVR" Margin="0,5" IsChecked="True"/>
+                        <CheckBox x:Name="OptHardwareAcceleratedGPU" Content="Enable Hardware-accelerated GPU Scheduling" Margin="0,5" IsChecked="True"/>
+                        <CheckBox x:Name="OptFullscreenOptimizations" Content="Disable Fullscreen Optimizations" Margin="0,5" IsChecked="True" FontWeight="Bold" Foreground="#4CAF50"/>
+                        <CheckBox x:Name="OptCPUScheduling" Content="Optimize CPU Scheduling for Games" Margin="0,5" IsChecked="True" FontWeight="Bold" Foreground="#4CAF50"/>
+                        <CheckBox x:Name="OptNagleAlgorithm" Content="Disable Nagle Algorithm (Lower Latency)" Margin="0,5" IsChecked="True" FontWeight="Bold" Foreground="#4CAF50"/>
+                    </StackPanel>
+                </Expander>
 
-                <!-- Services -->
-                <TextBlock Text="⚙️ Windows Services" FontSize="18" FontWeight="Bold" Margin="0,10,0,10"/>
-                <CheckBox x:Name="OptPrintSpooler" Content="Disable Print Spooler (if no printer)" Margin="20,5,0,5" IsChecked="False"/>
-                <CheckBox x:Name="OptFax" Content="Disable Fax Service" Margin="20,5,0,5" IsChecked="True"/>
-                <CheckBox x:Name="OptWindowsSearch" Content="Disable Windows Search Indexing" Margin="20,5,0,5" IsChecked="False"/>
-                <CheckBox x:Name="OptSuperfetch" Content="Disable Superfetch/SysMain (SSD only)" Margin="20,5,0,5" IsChecked="False"/>
-                <CheckBox x:Name="OptWindowsUpdate" Content="Set Windows Update to Manual" Margin="20,5,0,5" IsChecked="False"/>
+                <!-- Network Section -->
+                <Expander Header="🌐 NETWORK OPTIMIZATIONS (5 tweaks)" Margin="0,0,0,10">
+                    <StackPanel Margin="20,10">
+                        <CheckBox x:Name="OptTCPIP" Content="Optimize TCP/IP Stack" Margin="0,5" IsChecked="True" FontWeight="Bold" Foreground="#4CAF50"/>
+                        <CheckBox x:Name="OptDNS" Content="Set Cloudflare DNS (1.1.1.1)" Margin="0,5" IsChecked="True" FontWeight="Bold" Foreground="#4CAF50"/>
+                        <CheckBox x:Name="OptNetworkThrottling" Content="Disable Network Throttling" Margin="0,5" IsChecked="True" FontWeight="Bold" Foreground="#4CAF50"/>
+                        <CheckBox x:Name="OptNetworkAdapter" Content="Optimize Network Adapter Settings" Margin="0,5" IsChecked="True" FontWeight="Bold" Foreground="#4CAF50"/>
+                        <CheckBox x:Name="OptLargeSendOffload" Content="Disable Large Send Offload" Margin="0,5" FontWeight="Bold" Foreground="#4CAF50"/>
+                    </StackPanel>
+                </Expander>
 
-                <Separator Margin="0,15"/>
+                <!-- Debloat Section -->
+                <Expander Header="🗑️ DEBLOAT &amp; CLEANUP (7 tweaks)" Margin="0,0,0,10">
+                    <StackPanel Margin="20,10">
+                        <CheckBox x:Name="OptCleanTempFiles" Content="Clean Temporary Files" Margin="0,5" IsChecked="True"/>
+                        <CheckBox x:Name="OptRemoveBloatware" Content="Remove Bloatware Apps (Xbox, Teams, etc - 27 apps)" Margin="0,5" IsChecked="True" FontWeight="Bold" Foreground="#4CAF50"/>
+                        <CheckBox x:Name="OptDisableWidgets" Content="Disable Windows 11 Widgets" Margin="0,5" IsChecked="True" FontWeight="Bold" Foreground="#4CAF50"/>
+                        <CheckBox x:Name="OptRemoveCoPilot" Content="Remove Windows CoPilot" Margin="0,5" IsChecked="True" FontWeight="Bold" Foreground="#4CAF50"/>
+                        <CheckBox x:Name="OptDisableChat" Content="Disable Chat Icon (Teams)" Margin="0,5" IsChecked="True" FontWeight="Bold" Foreground="#4CAF50"/>
+                        <CheckBox x:Name="OptEmptyRecycleBin" Content="Empty Recycle Bin" Margin="0,5"/>
+                        <CheckBox x:Name="OptRemoveWindowsOld" Content="Remove Windows.old Folder" Margin="0,5"/>
+                    </StackPanel>
+                </Expander>
 
-                <!-- Gaming Optimizations -->
-                <TextBlock Text="🎮 Gaming Optimizations" FontSize="18" FontWeight="Bold" Margin="0,10,0,10"/>
-                <CheckBox x:Name="OptGameMode" Content="Enable Game Mode" Margin="20,5,0,5" IsChecked="True"/>
-                <CheckBox x:Name="OptGameBar" Content="Disable Xbox Game Bar" Margin="20,5,0,5" IsChecked="False"/>
-                <CheckBox x:Name="OptGameDVR" Content="Disable Game DVR" Margin="20,5,0,5" IsChecked="True"/>
-                <CheckBox x:Name="OptFullscreenOpt" Content="Enable Hardware Accelerated GPU Scheduling" Margin="20,5,0,5" IsChecked="True"/>
+                <!-- Storage Section -->
+                <Expander Header="💾 STORAGE &amp; MEMORY (5 tweaks)" Margin="0,0,0,10">
+                    <StackPanel Margin="20,10">
+                        <CheckBox x:Name="OptSearchIndexing" Content="Disable Search Indexing" Margin="0,5" FontWeight="Bold" Foreground="#4CAF50"/>
+                        <CheckBox x:Name="OptSSD" Content="Optimize SSD (Enable TRIM)" Margin="0,5" IsChecked="True" FontWeight="Bold" Foreground="#4CAF50"/>
+                        <CheckBox x:Name="OptSystemRestore" Content="Disable System Restore (Frees Space)" Margin="0,5"/>
+                        <CheckBox x:Name="OptCompactOS" Content="Compact OS (Compress Windows)" Margin="0,5"/>
+                        <CheckBox x:Name="OptPrefetch" Content="Disable Prefetch" Margin="0,5"/>
+                    </StackPanel>
+                </Expander>
 
-                <Separator Margin="0,15"/>
+                <!-- CPU & Memory Section -->
+                <Expander Header="🖥️ CPU &amp; MEMORY (5 tweaks)" Margin="0,0,0,10">
+                    <StackPanel Margin="20,10">
+                        <CheckBox x:Name="OptCoreParking" Content="Disable CPU Core Parking" Margin="0,5" IsChecked="True" FontWeight="Bold" Foreground="#4CAF50"/>
+                        <CheckBox x:Name="OptProcessorScheduling" Content="Optimize Processor Scheduling" Margin="0,5" IsChecked="True" FontWeight="Bold" Foreground="#4CAF50"/>
+                        <CheckBox x:Name="OptMemoryManagement" Content="Optimize Memory Management" Margin="0,5" IsChecked="True" FontWeight="Bold" Foreground="#4CAF50"/>
+                        <CheckBox x:Name="OptWriteCache" Content="Disable Write Cache Buffer Flushing" Margin="0,5"/>
+                        <CheckBox x:Name="OptSpectreMeltdown" Content="⚠️ Disable Spectre/Meltdown (EXPERT - SECURITY RISK!)" Margin="0,5" Foreground="#F44336"/>
+                    </StackPanel>
+                </Expander>
 
-                <!-- Cleanup -->
-                <TextBlock Text="🧹 System Cleanup" FontSize="18" FontWeight="Bold" Margin="0,10,0,10"/>
-                <CheckBox x:Name="OptTempFiles" Content="Clean Temporary Files" Margin="20,5,0,5" IsChecked="True"/>
-                <CheckBox x:Name="OptRecycleBin" Content="Empty Recycle Bin" Margin="20,5,0,5" IsChecked="False"/>
-                <CheckBox x:Name="OptWindowsOld" Content="Delete Windows.old Folder" Margin="20,5,0,5" IsChecked="False"/>
-                <CheckBox x:Name="OptDownloads" Content="Clean Downloads Folder" Margin="20,5,0,5" IsChecked="False"/>
+                <!-- UI Tweaks Section -->
+                <Expander Header="🎨 UI &amp; VISUAL TWEAKS (7 tweaks)" Margin="0,0,0,10">
+                    <StackPanel Margin="20,10">
+                        <CheckBox x:Name="OptShowFileExtensions" Content="Show File Extensions" Margin="0,5" IsChecked="True"/>
+                        <CheckBox x:Name="OptShowHiddenFiles" Content="Show Hidden Files" Margin="0,5" IsChecked="True"/>
+                        <CheckBox x:Name="OptLockScreen" Content="Disable Lock Screen" Margin="0,5" FontWeight="Bold" Foreground="#4CAF50"/>
+                        <CheckBox x:Name="OptActionCenter" Content="Disable Action Center" Margin="0,5"/>
+                        <CheckBox x:Name="OptClassicContextMenu" Content="Classic Context Menu (Windows 11)" Margin="0,5" IsChecked="True" FontWeight="Bold" Foreground="#4CAF50"/>
+                        <CheckBox x:Name="OptTaskbarLeft" Content="Move Taskbar to Left (Windows 11)" Margin="0,5"/>
+                        <CheckBox x:Name="OptSnapAssist" Content="Disable Snap Assist" Margin="0,5"/>
+                    </StackPanel>
+                </Expander>
 
-                <Separator Margin="0,15"/>
+                <!-- Advanced Section -->
+                <Expander Header="⚡ ADVANCED &amp; EXPERT (6 tweaks)" Margin="0,0,0,10">
+                    <StackPanel Margin="20,10">
+                        <CheckBox x:Name="OptCreateRestorePoint" Content="✅ Create System Restore Point (RECOMMENDED)" Margin="0,5" IsChecked="True" FontWeight="Bold"/>
+                        <CheckBox x:Name="OptDisableOneDrive" Content="Disable OneDrive" Margin="0,5"/>
+                        <CheckBox x:Name="OptDisableHibernation" Content="Disable Hibernation (Frees Space)" Margin="0,5"/>
+                        <CheckBox x:Name="OptFastStartup" Content="Disable Fast Startup" Margin="0,5" FontWeight="Bold" Foreground="#4CAF50"/>
+                        <CheckBox x:Name="OptRemoteAssistance" Content="Disable Remote Assistance" Margin="0,5" IsChecked="True" FontWeight="Bold" Foreground="#4CAF50"/>
+                        <CheckBox x:Name="OptErrorReporting" Content="Disable Error Reporting" Margin="0,5" IsChecked="True" FontWeight="Bold" Foreground="#4CAF50"/>
+                    </StackPanel>
+                </Expander>
 
-                <!-- Advanced -->
-                <TextBlock Text="⚠️ Advanced (Use with caution)" FontSize="18" FontWeight="Bold" Margin="0,10,0,10"/>
-                <CheckBox x:Name="OptCreateRestore" Content="Create System Restore Point Before Changes" Margin="20,5,0,5" IsChecked="True"/>
-                <CheckBox x:Name="OptDisableOneDrive" Content="Disable OneDrive" Margin="20,5,0,5" IsChecked="False"/>
-                <CheckBox x:Name="OptDisableHibernation" Content="Disable Hibernation (Frees Space)" Margin="20,5,0,5" IsChecked="False"/>
-                
             </StackPanel>
         </ScrollViewer>
 
-        <!-- Footer Buttons -->
-        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="20">
-            <Button Content="Cancel" Click="Cancel_Click" Width="100" Margin="0,0,10,0" Style="{StaticResource MaterialDesignOutlinedButton}"/>
-            <Button Content="Apply Optimizations" Click="Apply_Click" Width="150" Style="{StaticResource MaterialDesignRaisedButton}"/>
-        </StackPanel>
-
+        <!-- Action Buttons -->
+        <materialDesign:Card Grid.Row="2" Padding="16" materialDesign:ElevationAssist.Elevation="Dp8">
+            <StackPanel>
+                <TextBlock Text="⚠️ A system restore point will be created before applying optimizations." 
+                          FontSize="12" Opacity="0.7" Margin="0,0,0,10" TextWrapping="Wrap"/>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <TextBlock x:Name="SelectedCountText" Text="0 optimizations selected" 
+                              VerticalAlignment="Center" Margin="0,0,16,0" FontWeight="Bold"/>
+                    <Button x:Name="ApplyButton" Content="Apply Optimizations" 
+                           Style="{StaticResource MaterialDesignRaisedAccentButton}" 
+                           Click="Apply_Click" Margin="0,0,8,0" Padding="24,8"/>
+                    <Button x:Name="CancelButton" Content="Cancel" 
+                           Style="{StaticResource MaterialDesignOutlinedButton}" 
+                           Click="Cancel_Click" Padding="24,8"/>
+                </StackPanel>
+            </StackPanel>
+        </materialDesign:Card>
     </Grid>
 </Window>
-

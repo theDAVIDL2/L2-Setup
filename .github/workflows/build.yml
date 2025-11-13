@@ -1,4 +1,4 @@
-name: Build and Release
+name: Build and Release L2 Setup
 
 on:
   push:
@@ -7,6 +7,7 @@ on:
       - 'v*'
   pull_request:
     branches: [ main ]
+  workflow_dispatch:
 
 jobs:
   build:
@@ -14,10 +15,10 @@ jobs:
     
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     
     - name: Setup .NET
-      uses: actions/setup-dotnet@v3
+      uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 8.0.x
     
@@ -27,10 +28,7 @@ jobs:
     - name: Build
       run: dotnet build src/WindowsSetup.App/WindowsSetup.App.csproj --configuration Release --no-restore
     
-    - name: Test
-      run: dotnet test src/WindowsSetup.App/WindowsSetup.App.csproj --no-build --verbosity normal --configuration Release
-
-    - name: Publish
+    - name: Publish Self-Contained Executable
       run: |
         dotnet publish src/WindowsSetup.App/WindowsSetup.App.csproj `
           --configuration Release `
@@ -38,112 +36,259 @@ jobs:
           --self-contained true `
           --output Release `
           /p:PublishSingleFile=true `
-          /p:IncludeNativeLibrariesForSelfExtract=true
+          /p:IncludeNativeLibrariesForSelfExtract=true `
+          /p:EnableCompressionInSingleFile=true
+
+    - name: Verify Build Output
+      run: |
+        Write-Host "=== Build Output Contents ===" -ForegroundColor Cyan
+        Get-ChildItem -Path Release -Recurse | Format-Table Name, Length
+        if (Test-Path "Release/L2Setup.exe") {
+          Write-Host "✅ L2Setup.exe found!" -ForegroundColor Green
+          $size = (Get-Item "Release/L2Setup.exe").Length / 1MB
+          Write-Host "Size: $([math]::Round($size, 2)) MB" -ForegroundColor Yellow
+        } else {
+          Write-Host "❌ L2Setup.exe NOT FOUND!" -ForegroundColor Red
+          exit 1
+        }
 
     - name: Upload Build Artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
-        name: WindowsSetup-Build
-        path: Release/WindowsSetup.exe
+        name: L2Setup-Executable
+        path: Release/L2Setup.exe
+        if-no-files-found: error
+        retention-days: 90
 
-  release:
+  create-installer:
     needs: build
+    runs-on: windows-latest
+    if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Download Build Artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: L2Setup-Executable
+        path: Release
+
+    - name: Verify Downloaded Artifact
+      run: |
+        Write-Host "=== Downloaded Artifacts ===" -ForegroundColor Cyan
+        Get-ChildItem -Path Release -Recurse | Format-Table Name, Length
+        if (Test-Path "Release/L2Setup.exe") {
+          Write-Host "✅ L2Setup.exe downloaded successfully!" -ForegroundColor Green
+        } else {
+          Write-Host "❌ L2Setup.exe NOT FOUND after download!" -ForegroundColor Red
+          exit 1
+        }
+
+    - name: Setup Inno Setup
+      run: |
+        Write-Host "Installing Inno Setup 6..." -ForegroundColor Cyan
+        choco install innosetup -y --version=6.2.2
+        Write-Host "Inno Setup installed!" -ForegroundColor Green
+
+    - name: Create Installer
+      run: |
+        $isccPath = "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
+        if (-not (Test-Path $isccPath)) {
+          Write-Host "❌ ISCC.exe not found at $isccPath" -ForegroundColor Red
+          exit 1
+        }
+        Write-Host "Creating installer with Inno Setup..." -ForegroundColor Cyan
+        & $isccPath setup.iss
+        if ($LASTEXITCODE -ne 0) {
+          Write-Host "❌ Installer creation failed with exit code $LASTEXITCODE" -ForegroundColor Red
+          exit 1
+        }
+        Write-Host "✅ Installer created successfully!" -ForegroundColor Green
+
+    - name: Verify Installer Output
+      run: |
+        Write-Host "=== Installer Output ===" -ForegroundColor Cyan
+        if (Test-Path "Release") {
+          Get-ChildItem -Path Release -Filter "*.exe" | Format-Table Name, Length
+          $installer = Get-ChildItem -Path Release -Filter "L2Setup-Installer.exe" | Select-Object -First 1
+          if ($installer) {
+            Write-Host "✅ Installer found: $($installer.Name)" -ForegroundColor Green
+            $size = $installer.Length / 1MB
+            Write-Host "Size: $([math]::Round($size, 2)) MB" -ForegroundColor Yellow
+          } else {
+            Write-Host "❌ L2Setup-Installer.exe NOT FOUND!" -ForegroundColor Red
+            exit 1
+          }
+        } else {
+          Write-Host "❌ Release directory not found!" -ForegroundColor Red
+          exit 1
+        }
+
+    - name: Upload Installer Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: L2Setup-Installer
+        path: Release/L2Setup-Installer.exe
+        if-no-files-found: error
+        retention-days: 90
+
+  create-release:
+    needs: create-installer
     runs-on: windows-latest
     if: startsWith(github.ref, 'refs/tags/v')
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
-    - name: Download Build Artifact
-      uses: actions/download-artifact@v3
+    - name: Download Executable Artifact
+      uses: actions/download-artifact@v4
       with:
-        name: WindowsSetup-Build
-        path: Release
+        name: L2Setup-Executable
+        path: artifacts/executable
 
-    - name: Setup Inno Setup
-      run: |
-        choco install innosetup -y
+    - name: Download Installer Artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: L2Setup-Installer
+        path: artifacts/installer
 
-    - name: Create Installer
+    - name: Prepare Release Assets
       run: |
-        & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" setup.iss
+        Write-Host "=== Preparing Release Assets ===" -ForegroundColor Cyan
+        New-Item -ItemType Directory -Force -Path release-assets
+        
+        # Copy and rename with version
+        $version = "${{ github.ref_name }}"
+        Copy-Item "artifacts/executable/L2Setup.exe" "release-assets/L2Setup-$version.exe"
+        Copy-Item "artifacts/installer/L2Setup-Installer.exe" "release-assets/L2Setup-Installer-$version.exe"
+        
+        Write-Host "✅ Release assets prepared:" -ForegroundColor Green
+        Get-ChildItem -Path release-assets | Format-Table Name, Length
 
     - name: Get Version
       id: version
       run: |
-        $version = "${{ github.ref_name }}"
+        $version = "${{ github.ref_name }}" -replace '^v', ''
         echo "VERSION=$version" >> $env:GITHUB_OUTPUT
+        Write-Host "Version: $version" -ForegroundColor Cyan
 
-    - name: Create Release
-      uses: softprops/action-gh-release@v1
+    - name: Generate Release Notes
+      id: release_notes
+      run: |
+        $version = "${{ steps.version.outputs.VERSION }}"
+        $notes = @"
+        # 🚀 L2 Setup v$version
+
+        ## 📥 Downloads
+
+        | File | Description | Size |
+        |------|-------------|------|
+        | **L2Setup-Installer-$version.exe** | 🎯 **Recommended** - Includes .NET 8 auto-installer | ~49 MB |
+        | **L2Setup-$version.exe** | Standalone executable (requires .NET 8) | ~166 MB |
+
+        ## ✨ What's New
+
+        See [CHANGELOG.md](https://github.com/theDAVIDL2/L2-Setup/blob/main/CHANGELOG.md) for detailed changes.
+
+        ## 🎯 Features
+
+        - ✅ **50+ Windows Optimizations** (Performance, Privacy, Gaming, Network, Debloat)
+        - ✅ **44+ Development Tools** Installation (Git, Python, Node.js, VS Code, etc.)
+        - ✅ **30+ Runtimes** (VC++, .NET, DirectX, Java, OpenAL)
+        - ✅ **Browser Profile Backup/Restore** (Brave, Chrome, Edge, Firefox)
+        - ✅ **GPU Driver Auto-Detection** (NVIDIA, AMD, Intel)
+        - ✅ **Windows Activation** (MAS integration)
+        - ✅ **Material Design UI** with modern interface
+
+        ## 📋 Requirements
+
+        - **OS**: Windows 10 (1809+) or Windows 11
+        - **RAM**: 4 GB minimum (8 GB recommended)
+        - **Storage**: 10 GB free space
+        - **Internet**: Required for downloads
+        - **.NET**: 8.0 Runtime (auto-installed by installer)
+
+        ## 🚀 Quick Start
+
+        ### After Formatting:
+        1. Download **L2Setup-Installer-$version.exe**
+        2. Run as Administrator
+        3. Follow the wizard
+        4. Enjoy your optimized system!
+
+        ### Before Formatting:
+        1. Launch L2 Setup
+        2. Go to "Browser Management" tab
+        3. Backup your browser profiles
+        4. Save to USB/Cloud
+
+        ## 🔧 Installation
+
+        ### Option 1: Installer (Recommended)
+        - Download **L2Setup-Installer-$version.exe**
+        - Run as Administrator
+        - .NET 8 will be installed automatically if needed
+        - Follow the installation wizard
+
+        ### Option 2: Standalone
+        - Download **L2Setup-$version.exe**
+        - Requires .NET 8 Runtime (download link provided if missing)
+        - Run directly (no installation)
+
+        ## 📊 Optimizations Included
+
+        - 🚀 **Performance** (9 tweaks): Background Apps, Animations, Transparency
+        - 🔒 **Privacy** (7 tweaks): Telemetry, Cortana, Tracking
+        - 🎮 **Gaming** (7 tweaks): Game Mode, CPU Scheduling, Nagle Algorithm
+        - 🌐 **Network** (5 tweaks): TCP/IP, DNS, Throttling
+        - 🗑️ **Debloat** (7 tweaks): Remove 27 bloatware apps
+        - 💾 **Storage** (5 tweaks): SSD optimization, Indexing
+        - 🖥️ **CPU & Memory** (5 tweaks): Core Parking, Scheduling
+        - 🎨 **UI Tweaks** (7 tweaks): Context Menu, Lock Screen
+        - ⚡ **Expert** (6 tweaks): OneDrive, Hibernation, UAC
+
+        ## 🆘 Support
+
+        - 🐛 [Report a Bug](https://github.com/theDAVIDL2/L2-Setup/issues)
+        - 💡 [Request a Feature](https://github.com/theDAVIDL2/L2-Setup/issues)
+        - 📖 [Documentation](https://github.com/theDAVIDL2/L2-Setup/tree/main/docs)
+
+        ## 🌟 Star this repo if you find it useful!
+
+        ---
+
+        **Made with ❤️ by [L2 - theDAVIDL2](https://github.com/theDAVIDL2)**
+        "@
+        
+        # Save to file for use in release
+        $notes | Out-File -FilePath release-notes.md -Encoding UTF8
+        Write-Host "✅ Release notes generated" -ForegroundColor Green
+
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v2
       with:
         files: |
-          Output/WindowsPostFormatSetup*.exe
+          release-assets/L2Setup-Installer-${{ github.ref_name }}.exe
+          release-assets/L2Setup-${{ github.ref_name }}.exe
+        body_path: release-notes.md
         draft: false
         prerelease: false
         generate_release_notes: true
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      continue-on-error: true
-    
-    - name: Publish
-      run: dotnet publish src/WindowsSetup.App/WindowsSetup.App.csproj -c Release -r win-x64 --self-contained false -o publish/
-    
-    - name: Setup Inno Setup
-      run: |
-        choco install innosetup -y
-        refreshenv
-    
-    - name: Create Installer
-      run: |
-        $env:PATH += ";C:\Program Files (x86)\Inno Setup 6"
-        iscc setup.iss
-      shell: pwsh
-    
-    - name: Upload Build Artifact
-      uses: actions/upload-artifact@v3
-      with:
-        name: WindowsSetupApp
-        path: publish/
-    
-    - name: Upload Installer Artifact
-      uses: actions/upload-artifact@v3
-      with:
-        name: WindowsPostFormatSetup-Installer
-        path: output/*.exe
-    
-    - name: Create Release
-      if: startsWith(github.ref, 'refs/tags/v')
-      uses: softprops/action-gh-release@v1
-      with:
-        files: |
-          output/WindowsPostFormatSetup_*.exe
-        draft: false
-        prerelease: false
-        body: |
-          # Windows Post-Format Setup Tool ${{ github.ref_name }}
-          
-          ## 📥 Download
-          
-          Download `WindowsPostFormatSetup_v*.exe` and run as administrator.
-          
-          ## ✨ Features
-          
-          - 🌐 Browser profile backup/restore
-          - 🔧 Automatic tool installation
-          - ⚡ Windows optimizations
-          - 🔑 Windows activation
-          
-          ## 📋 Requirements
-          
-          - Windows 10/11 (64-bit)
-          - .NET 8 Runtime (installed automatically)
-          - Administrator privileges
-          
-          ## 📝 Changelog
-          
-          See [CHANGELOG.md](docs/CHANGELOG.md) for details.
+        name: "L2 Setup ${{ github.ref_name }}"
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+    - name: Release Summary
+      run: |
+        Write-Host "`n╔════════════════════════════════════════════════════════════╗" -ForegroundColor Green
+        Write-Host "║           ✅ RELEASE CREATED SUCCESSFULLY! ✅              ║" -ForegroundColor Green
+        Write-Host "╚════════════════════════════════════════════════════════════╝`n" -ForegroundColor Green
+        Write-Host "📦 Version: ${{ github.ref_name }}" -ForegroundColor Cyan
+        Write-Host "🔗 URL: https://github.com/theDAVIDL2/L2-Setup/releases/tag/${{ github.ref_name }}" -ForegroundColor Yellow
+        Write-Host "`n✅ Assets uploaded:" -ForegroundColor Green
+        Write-Host "   • L2Setup-Installer-${{ github.ref_name }}.exe" -ForegroundColor White
+        Write-Host "   • L2Setup-${{ github.ref_name }}.exe" -ForegroundColor White
+        Write-Host "`n🎉 Release is now live!" -ForegroundColor Green

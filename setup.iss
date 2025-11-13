@@ -6,7 +6,7 @@
 
 [Setup]
 AppName=L2 Setup
-AppVersion=1.0.0
+AppVersion=1.0.1
 AppPublisher=L2 - theDAVIDL2
 AppPublisherURL=https://github.com/theDAVIDL2/L2-Setup
 AppSupportURL=https://github.com/theDAVIDL2/L2-Setup/issues
@@ -26,7 +26,7 @@ ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
 UninstallDisplayIcon={app}\L2Setup.exe
 UninstallDisplayName=L2 Setup
-VersionInfoVersion=1.0.0.0
+VersionInfoVersion=1.0.1.0
 VersionInfoCompany=L2
 VersionInfoDescription=L2 Setup - All-in-One Windows Setup Tool
 VersionInfoCopyright=Copyright (C) 2025 L2

@@ -33,13 +33,13 @@ This guide explains how to build the project from source code.
 
 ```bash
 # Using HTTPS
-git clone https://github.com/yourusername/windows-post-format-setup.git
+git clone https://github.com/theDAVIDL2/L2-Setup.git
 
 # Using SSH
 git clone git@github.com:yourusername/windows-post-format-setup.git
 
 # Navigate to project directory
-cd windows-post-format-setup
+cd L2-Setup
 ```
 
 ### Fork the Repository (for contributions)
@@ -49,7 +49,7 @@ cd windows-post-format-setup
 3. Clone your fork:
 ```bash
 git clone https://github.com/YOUR-USERNAME/windows-post-format-setup.git
-cd windows-post-format-setup
+cd L2-Setup
 git remote add upstream https://github.com/ORIGINAL-OWNER/windows-post-format-setup.git
 ```
 
@@ -133,7 +133,7 @@ iscc setup.iss
 ## Project Structure
 
 ```
-windows-post-format-setup/
+L2-Setup/
 ├── src/
 │   └── WindowsSetup.App/
 │       ├── WindowsSetup.App.csproj    # Project file

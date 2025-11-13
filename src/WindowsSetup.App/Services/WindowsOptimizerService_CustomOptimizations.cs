@@ -14,52 +14,102 @@ namespace WindowsSetup.App.Services
         {
             try
             {
-                _logger.LogInfo("=== Applying Custom Windows Optimizations ===");
+                _logger.LogInfo("=== Applying Custom Windows Optimizations (L2 Enhanced) ===");
 
                 if (settings.CreateRestorePoint)
                 {
                     await CreateRestorePoint();
                 }
 
-                // Performance
+                // ═══════════════════════════════════════════════════════════
+                // 🚀 PERFORMANCE
+                // ═══════════════════════════════════════════════════════════
                 if (settings.HighPerformancePowerPlan) await OptimizePower();
                 if (settings.DisableMouseAcceleration) await OptimizeMouse();
                 if (settings.OptimizeVisualEffects) await OptimizeVisualEffects();
                 if (settings.OptimizeExplorer) await OptimizeExplorer();
                 if (settings.DisableStartupPrograms) await DisableStartupPrograms();
                 if (settings.OptimizePageFile) await OptimizePageFile();
+                if (settings.DisableBackgroundApps) await DisableBackgroundApps();
+                if (settings.DisableTransparency) await DisableTransparency();
+                if (settings.DisableAnimations) await DisableAnimations();
 
-                // Privacy
+                // ═══════════════════════════════════════════════════════════
+                // 🔒 PRIVACY & TELEMETRY
+                // ═══════════════════════════════════════════════════════════
                 if (settings.DisableTelemetry) await DisableTelemetry();
                 if (settings.DisableCortana) await DisableCortana();
                 if (settings.DisableAdvertisingId) await DisableAdvertisingId();
                 if (settings.DisableLocationTracking) await DisableLocationTracking();
                 if (settings.DisableDiagnostics) await DisableDiagnosticData();
+                if (settings.DisableActivityHistory) await DisableActivityHistory();
+                if (settings.DisableWebSearch) await DisableWebSearch();
 
-                // Services
+                // ═══════════════════════════════════════════════════════════
+                // ⚙️ SERVICES & FEATURES
+                // ═══════════════════════════════════════════════════════════
                 if (settings.DisablePrintSpooler) await DisableService("Spooler");
                 if (settings.DisableFax) await DisableService("Fax");
                 if (settings.DisableWindowsSearch) await DisableService("WSearch");
                 if (settings.DisableSuperfetch) await DisableService("SysMain");
                 if (settings.SetWindowsUpdateManual) await SetServiceManual("wuauserv");
 
-                // Gaming
+                // ═══════════════════════════════════════════════════════════
+                // 🎮 GAMING OPTIMIZATIONS
+                // ═══════════════════════════════════════════════════════════
                 if (settings.EnableGameMode) await EnableGameMode();
                 if (settings.DisableGameBar) await DisableGameBar();
                 if (settings.DisableGameDVR) await DisableGameDVR();
                 if (settings.EnableHardwareAcceleratedGPU) await EnableHardwareAcceleratedGPU();
+                if (settings.DisableFullscreenOptimizations) await DisableFullscreenOptimizations();
+                if (settings.OptimizeCPUScheduling) await OptimizeCPUScheduling();
+                if (settings.DisableNagleAlgorithm) await DisableNagleAlgorithm();
 
-                // Cleanup
+                // ═══════════════════════════════════════════════════════════
+                // 🌐 NETWORK OPTIMIZATIONS
+                // ═══════════════════════════════════════════════════════════
+                if (settings.OptimizeTCPIP) await OptimizeTCPIP();
+                if (settings.OptimizeDNS) await OptimizeDNS();
+                if (settings.DisableNetworkThrottling) await DisableNetworkThrottling();
+
+                // ═══════════════════════════════════════════════════════════
+                // 🗑️ DEBLOAT & CLEANUP
+                // ═══════════════════════════════════════════════════════════
                 if (settings.CleanTempFiles) await CleanTemporaryFiles();
                 if (settings.EmptyRecycleBin) await EmptyRecycleBin();
                 if (settings.DeleteWindowsOld) await DeleteWindowsOld();
                 if (settings.CleanDownloads) await CleanDownloads();
+                if (settings.RemoveBloatwareApps) await RemoveBloatwareApps();
+                if (settings.DisableWidgets) await DisableWidgets();
+                if (settings.RemoveCoPilot) await RemoveCoPilot();
 
-                // Advanced
+                // ═══════════════════════════════════════════════════════════
+                // 💾 STORAGE & MEMORY
+                // ═══════════════════════════════════════════════════════════
+                if (settings.DisableSearchIndexing) await DisableSearchIndexing();
+                if (settings.OptimizeSSD) await OptimizeSSD();
+
+                // ═══════════════════════════════════════════════════════════
+                // 🖥️ CPU & MEMORY OPTIMIZATIONS
+                // ═══════════════════════════════════════════════════════════
+                if (settings.DisableCoreParking) await DisableCoreParking();
+                if (settings.DisableSpectreMeltdown) await DisableSpectreMeltdown();
+
+                // ═══════════════════════════════════════════════════════════
+                // 🎨 UI TWEAKS
+                // ═══════════════════════════════════════════════════════════
+                if (settings.ShowFileExtensions) await OptimizeExplorer();
+                if (settings.DisableLockScreen) await DisableLockScreen();
+                if (settings.ClassicContextMenu) await ClassicContextMenu();
+
+                // ═══════════════════════════════════════════════════════════
+                // ⚡ ADVANCED & EXPERT
+                // ═══════════════════════════════════════════════════════════
                 if (settings.DisableOneDrive) await DisableOneDrive();
                 if (settings.DisableHibernation) await DisableHibernation();
 
-                _logger.LogSuccess("=== Custom Optimizations Applied Successfully! ===");
+                _logger.LogSuccess("=== L2 Enhanced Optimizations Applied Successfully! ===");
+                _logger.LogWarning("⚠️ A REBOOT is RECOMMENDED for all changes to take effect!");
             }
             catch (Exception ex)
             {
@@ -78,8 +128,18 @@ namespace WindowsSetup.App.Services
 
         private async Task OptimizePageFile()
         {
-            _logger.LogInfo("Optimizing virtual memory...");
-            await _commandRunner.RunCommandAsync("wmic", "computersystem where name=\"%computername%\" set AutomaticManagedPagefile=True");
+            _logger.LogInfo("Optimizing virtual memory (enabling system-managed page file)...");
+            try
+            {
+                // Use PowerShell instead of deprecated wmic
+                var psCommand = "$cs = Get-CimInstance -ClassName Win32_ComputerSystem; $cs.AutomaticManagedPagefile = $true; Set-CimInstance -InputObject $cs";
+                await _commandRunner.RunCommandAsync("powershell", $"-NoProfile -ExecutionPolicy Bypass -Command \"{psCommand}\"");
+                _logger.LogSuccess("Virtual memory optimized (automatic managed page file enabled)");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning($"Could not optimize page file: {ex.Message}");
+            }
         }
 
         private async Task DisableCortana()

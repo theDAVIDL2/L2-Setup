@@ -21,67 +21,132 @@ namespace WindowsSetup.App.Services
         {
             try
             {
-                _logger.LogInfo("Starting Windows activation process...");
-                _logger.LogWarning("This will run Microsoft Activation Scripts");
+                _logger.LogInfo("═══════════════════════════════════════════════════════════");
+                _logger.LogInfo("Starting Windows Activation Process...");
+                _logger.LogWarning("⚠️ MANUAL INTERACTION MAY BE REQUIRED!");
+                _logger.LogInfo("═══════════════════════════════════════════════════════════");
+                _logger.LogInfo("");
+                _logger.LogInfo("📋 What will happen:");
+                _logger.LogInfo("   1. A CMD window will open with Microsoft Activation Scripts");
+                _logger.LogInfo("   2. The script will try to auto-select option [1] (HWID)");
+                _logger.LogInfo("   3. ⚠️ If auto-selection fails, YOU MUST press '1' + ENTER");
+                _logger.LogInfo("   4. Wait for activation to complete");
+                _logger.LogInfo("");
+                _logger.LogWarning("⏱️ The process may take 30-60 seconds...");
+                _logger.LogWarning("👀 WATCH THE CMD WINDOW THAT WILL APPEAR!");
+                _logger.LogInfo("═══════════════════════════════════════════════════════════");
+                _logger.LogInfo("");
 
-                // Run PowerShell script
+                // Give user time to read instructions
+                await Task.Delay(3000);
+
+                _logger.LogInfo("🚀 Launching Microsoft Activation Scripts...");
+
+                // Create batch wrapper for better control
+                var batContent = @"@echo off
+title L2 Setup - Windows Activation (Microsoft Activation Scripts)
+color 0B
+echo.
+echo ========================================================
+echo    Microsoft Activation Scripts (MAS)
+echo    L2 Setup - Automatic Activation Attempt
+echo ========================================================
+echo.
+echo [INFO] Downloading and running MAS...
+echo [INFO] Please wait...
+echo.
+powershell -NoProfile -ExecutionPolicy Bypass -Command ""irm https://get.activated.win | iex""
+echo.
+echo ========================================================
+if %ERRORLEVEL% EQU 0 (
+    echo    [SUCCESS] Activation process completed!
+) else (
+    echo    [WARNING] Process exited with code: %ERRORLEVEL%
+    echo    This doesn't necessarily mean failure.
+)
+echo ========================================================
+echo.
+echo Press any key to close this window...
+pause >nul
+";
+
+                var batPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "L2Setup_WindowsActivation.bat");
+                await System.IO.File.WriteAllTextAsync(batPath, batContent);
+
+                _logger.LogInfo("⏳ Starting activation script...");
+                _logger.LogInfo("");
+                _logger.LogWarning("⚠️ IMPORTANT INSTRUCTIONS:");
+                _logger.LogInfo("   → A CMD window will appear");
+                _logger.LogInfo("   → If you see a menu, press '1' for HWID Activation");
+                _logger.LogInfo("   → Press ENTER to confirm");
+                _logger.LogInfo("   → Wait for the process to complete");
+                _logger.LogInfo("   → The window will close automatically when done");
+                _logger.LogInfo("");
+
                 var psi = new ProcessStartInfo
                 {
-                    FileName = "powershell.exe",
-                    Arguments = "-NoProfile -ExecutionPolicy Bypass -Command \"irm https://get.activated.win | iex\"",
-                    UseShellExecute = false,
-                    RedirectStandardInput = true,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    CreateNoWindow = false // Show window for user to see progress
+                    FileName = "cmd.exe",
+                    Arguments = $"/c \"{batPath}\"",
+                    UseShellExecute = true,
+                    Verb = "runas", // Run as admin
+                    WindowStyle = ProcessWindowStyle.Normal
                 };
 
                 var process = Process.Start(psi);
                 if (process == null)
                 {
-                    _logger.LogError("Failed to start activation process");
+                    _logger.LogError("❌ Failed to start activation process");
                     return;
                 }
 
-                // Wait for menu to appear
-                _logger.LogInfo("Waiting for activation menu...");
-                await Task.Delay(5000); // Give time for script to load
+                _logger.LogSuccess("✅ Activation window launched!");
+                _logger.LogInfo("📝 The CMD window is now running...");
+                _logger.LogInfo("");
+                _logger.LogInfo("⏱️ Waiting for activation to complete...");
+                _logger.LogInfo("   (This process runs in a separate window)");
+                _logger.LogInfo("");
+                _logger.LogWarning("👉 Remember: Press '1' + ENTER if you see a menu!");
 
-                // Send option "1" for HWID Activation
-                try
+                // Monitor process in background
+                _ = Task.Run(async () =>
                 {
-                    await process.StandardInput.WriteLineAsync("1");
-                    await process.StandardInput.FlushAsync();
-                    _logger.LogInfo("Sent activation option '1' (HWID)");
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogWarning($"Could not send input automatically: {ex.Message}");
-                    _logger.LogInfo("Please select option 1 manually in the PowerShell window");
-                }
+                    try
+                    {
+                        await Task.Run(() => process.WaitForExit());
+                        
+                        // Clean up temp file
+                        try { System.IO.File.Delete(batPath); } catch { }
+                        
+                        _logger.LogInfo("");
+                        _logger.LogInfo("═══════════════════════════════════════════════════════════");
+                        _logger.LogInfo("✅ Activation window has closed");
+                        _logger.LogInfo("═══════════════════════════════════════════════════════════");
+                        _logger.LogInfo("");
+                        _logger.LogInfo("📋 Next steps:");
+                        _logger.LogInfo("   1. Click 'Check Status' button below to verify");
+                        _logger.LogInfo("   2. If not activated, check the CMD output for errors");
+                        _logger.LogInfo("   3. You may need to try again or use manual activation");
+                        _logger.LogInfo("");
+                        _logger.LogSuccess("💡 TIP: Activation can take a few minutes to reflect in the system");
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError($"Error monitoring activation process: {ex.Message}");
+                    }
+                });
 
-                // Wait for process to complete
-                await process.WaitForExitAsync();
-
-                _logger.LogSuccess("Activation process completed!");
-
-                // Check activation status
-                await Task.Delay(2000);
-                var status = await CheckWindowsActivationStatus();
-                
-                if (status.IsActivated)
-                {
-                    _logger.LogSuccess($"Windows is activated! License: {status.LicenseType}");
-                }
-                else
-                {
-                    _logger.LogWarning("Activation status could not be verified. Please check manually.");
-                }
+                // Don't wait for completion - let it run in background
+                _logger.LogInfo("ℹ️ You can continue using the app while activation runs");
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Activation error: {ex.Message}");
-                throw;
+                _logger.LogError($"❌ Failed to start Windows activation: {ex.Message}");
+                _logger.LogInfo("");
+                _logger.LogInfo("💡 Try manual activation:");
+                _logger.LogInfo("   1. Open PowerShell as Administrator");
+                _logger.LogInfo("   2. Run: irm https://get.activated.win | iex");
+                _logger.LogInfo("   3. Select option [1] HWID Activation");
+                _logger.LogInfo("   4. Follow the on-screen instructions");
             }
         }
 

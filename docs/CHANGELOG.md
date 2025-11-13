@@ -168,11 +168,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Support
 
 For issues, questions, or feature requests:
-- 🐛 [Report a Bug](https://github.com/yourusername/windows-post-format-setup/issues)
-- 💡 [Request a Feature](https://github.com/yourusername/windows-post-format-setup/issues)
-- 📖 [Read the Docs](https://github.com/yourusername/windows-post-format-setup/docs)
+- 🐛 [Report a Bug](https://github.com/theDAVIDL2/L2-Setup/issues)
+- 💡 [Request a Feature](https://github.com/theDAVIDL2/L2-Setup/issues)
+- 📖 [Read the Docs](https://github.com/theDAVIDL2/L2-Setup/tree/main/docs)
 
 ---
 
-**[1.0.0]:** https://github.com/yourusername/windows-post-format-setup/releases/tag/v1.0.0
+**[1.0.0]:** https://github.com/theDAVIDL2/L2-Setup/releases/tag/v1.0.0
 

@@ -7,7 +7,7 @@
     <UseWPF>true</UseWPF>
     <AssemblyName>L2Setup</AssemblyName>
     <RootNamespace>L2.Setup</RootNamespace>
-    <Version>1.0.0</Version>
+    <Version>1.0.1</Version>
     <Authors>L2 - theDAVIDL2</Authors>
     <Company>L2</Company>
     <Product>L2 Setup</Product>

@@ -1,312 +1,547 @@
+<div align="center">
+
 # 🚀 L2 Setup
+### All-in-One Windows Post-Format Automation Tool
 
-![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![.NET](https://img.shields.io/badge/.NET-8.0-purple.svg)
-![Platform](https://img.shields.io/badge/platform-Windows-blue.svg)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![.NET](https://img.shields.io/badge/.NET-8.0-purple.svg)](https://dotnet.microsoft.com/)
+[![Platform](https://img.shields.io/badge/platform-Windows-blue.svg)](https://www.microsoft.com/windows)
+[![GitHub release](https://img.shields.io/github/v/release/theDAVIDL2/L2-Setup)](https://github.com/theDAVIDL2/L2-Setup/releases)
+[![Stars](https://img.shields.io/github/stars/theDAVIDL2/L2-Setup?style=social)](https://github.com/theDAVIDL2/L2-Setup/stargazers)
 
-**All-in-One Windows Post-Format Automation by L2**
+**Save hours of post-format setup with automated tool installation, browser profile restoration, and 50+ Windows optimizations!**
 
-## 📋 Sobre
+[📥 Download Latest Release](https://github.com/theDAVIDL2/L2-Setup/releases) • [📖 Documentation](docs/) • [🐛 Report Bug](https://github.com/theDAVIDL2/L2-Setup/issues) • [💡 Request Feature](https://github.com/theDAVIDL2/L2-Setup/issues)
 
-**L2 Setup** é uma ferramenta completa de automação para configuração pós-formatação do Windows. Economize horas instalando ferramentas, restaurando perfis de navegador e otimizando o sistema com apenas alguns cliques!
-
-**⚠️ IMPORTANTE:** Use ANTES de formatar para fazer backup e DEPOIS para restaurar e configurar tudo automaticamente!
-
-## ✨ Funcionalidades
-
-### 🌐 Gerenciamento de Browsers (PRINCIPAL)
-
-- ✅ **Backup completo do profile Brave**
-  - Extensões, favoritos, senhas, configurações
-  - Compressão automática para economia de espaço
-  - Suporte para salvar em USB ou nuvem
-- ✅ **Restore pós-formatação com 1 clique**
-  - Detecção automática de backups em USB
-  - Restauração completa do perfil
-- ✅ **Configurar Brave como navegador padrão automaticamente**
-- ✅ Suporte para Chrome, Edge, Firefox (em desenvolvimento)
-
-### 🔧 Instalação de Ferramentas (44+ Apps)
-
-**Ferramentas de Desenvolvimento:**
-- Git, Python 3.13, Node.js LTS
-- Visual Studio Code, Cursor IDE
-- Notepad++, Visual Studio 2022 Community
-- Inno Setup 6, Rust, Go
-- Java 21 (compatível com Minecraft)
-- Amazon Corretto 8, 17, 21
-- Postman, DBeaver, FileZilla, PuTTY
-- Yarn, pnpm, Bun, GitHub Desktop
-
-**Navegadores:**
-- Brave Browser (configurado como padrão)
-- Comet (Perplexity AI Browser)
-
-**Aplicativos Essenciais:**
-- Discord, Steam, WinRAR (ativado automaticamente)
-- Lightshot, JDownloader 2
-- System Informer
-
-### 🎮 Runtimes All-in-One (30+ Pacotes)
-
-**Visual C++ Redistributables:**
-- 2005, 2008, 2010, 2012, 2013, 2015-2022 (x86 + x64)
-
-**.NET Framework:**
-- 3.5, 4.5.2, 4.6.2, 4.7.2, 4.8, 4.8.1
-
-**.NET Runtimes (Modernos):**
-- 5.0, 6.0, 7.0, 8.0 (x64)
-
-**Gaming & Multimídia:**
-- DirectX End-User Runtime
-- XNA Framework 4.0
-- OpenAL
-
-**Java:**
-- Java Runtime 8 & 21 LTS
-
-**Outros:**
-- Visual Studio Tools for Office Runtime
-
-### 🖥️ Detecção de GPU e Drivers
-
-- 🔍 **Detecção automática** de placas NVIDIA, AMD ou Intel
-- 📥 **Download e instalação** de drivers mais recentes
-- ⚡ **Otimização para gaming**
-
-### ⚙️ Otimizações do Windows (30+ Opções)
-
-**Performance:**
-- ⚡ Plano de energia (High Performance)
-- 🖱️ Desativar aceleração do mouse
-- 🎨 Otimizar efeitos visuais
-- 📁 Otimizar File Explorer
-- 🚀 Desativar programas de inicialização
-- 💾 Otimizar arquivo de paginação
-
-**Privacidade & Telemetria:**
-- 🔒 Desativar telemetria do Windows
-- 🚫 Desativar Cortana
-- 📊 Desativar Advertising ID
-- 📍 Desativar rastreamento de localização
-- 🔐 Desativar coleta de dados diagnósticos
-
-**Serviços Desnecessários:**
-- 🖨️ Print Spooler (se não usar impressora)
-- 📠 Fax Service
-- 🔍 Windows Search (se não usar)
-- 💿 Superfetch/SysMain
-- 🔄 Windows Update (usuários avançados)
-
-**Gaming:**
-- 🎮 Ativar Game Mode
-- 🎯 Desativar Game Bar
-- 📹 Desativar Game DVR
-- 🚀 Ativar Hardware-accelerated GPU Scheduling
-
-**Limpeza:**
-- 🧹 Limpar arquivos temporários
-- 🗑️ Esvaziar lixeira
-- 📦 Remover pasta Windows.old
-- 📥 Limpar pasta Downloads
-
-**Avançado:**
-- 💾 Criar ponto de restauração
-- ☁️ Desativar OneDrive
-- 💤 Desativar hibernação
-- 🔧 Executar Chris Titus Tech Script (externo)
-
-### 🔑 Ativação do Windows
-
-- 🔐 **Ativação automática via Microsoft Activation Scripts (MAS)**
-- ✅ **Método HWID** (Hardware ID)
-- 🚀 **Sem interação do usuário** - seleção automática de opções
-
-## 📥 Instalação
-
-### Download
-
-Baixe a versão mais recente na [página de Releases](https://github.com/theDAVIDL2/L2-Setup/releases).
-
-### Arquivos
-
-- **L2Setup-Installer.exe** (~49 MB) - Instalador completo com instalação automática do .NET 8
-- **L2Setup.exe** (~166 MB) - Aplicativo standalone (requer .NET 8)
-
-### Instalação Recomendada
-
-1. Baixe `L2Setup-Installer.exe`
-2. Execute como Administrador
-3. O instalador detectará e instalará automaticamente o .NET 8 se necessário
-4. Siga o assistente de instalação
-5. Lance o **L2 Setup** e comece a usar!
-
-## 🎯 Como Usar
-
-### ⚠️ ANTES de Formatar
-
-1. Abra o **L2 Setup**
-2. Vá para **Browser Management**
-3. Clique em **"Backup Brave Profile"**
-4. Salve em USB, cloud ou outro local seguro
-
-### ✅ DEPOIS de Formatar
-
-1. Instale o **L2 Setup** (usando o instalador)
-2. Execute o aplicativo (sempre como Administrador)
-3. **Quick Setup:**
-   - Clique em "Install All Tools" para instalar todas as 44+ ferramentas
-   - Clique em "Install GPU Drivers" para drivers da placa de vídeo
-   - Clique em "Install All Runtimes" para todos os 30+ runtimes
-4. **Custom Selection:**
-   - Selecione ferramentas específicas para instalar
-   - Use "Select All", "Deselect All" ou escolha manualmente
-5. **Browser Management:**
-   - Clique em "Restore Brave Profile" e selecione seu backup
-   - Clique em "Set as Default" para configurar Brave como padrão
-6. **Windows Optimization:**
-   - Clique em "Customize & Apply Optimizations"
-   - Selecione as otimizações desejadas por categoria
-   - Use presets: "Select All", "Deselect All", "Recommended"
-   - Clique em "Apply Optimizations"
-7. **Windows Activation:**
-   - Clique em "Activate Windows" para ativação automática
-   - Aguarde o processo (MAS será executado automaticamente)
-
-## 🛠️ Para Desenvolvedores
-
-### Requisitos
-
-- Windows 10/11 (64-bit)
-- .NET 8 SDK
-- Visual Studio 2022 Community (ou superior) com workload ".NET desktop development"
-- Inno Setup 6 (para criar o instalador)
-
-### Compilação
-
-```bash
-# Clone o repositório
-git clone https://github.com/theDAVIDL2/L2-Setup.git
-cd L2-Setup
-
-# Restaurar dependências
-dotnet restore src/WindowsSetup.App/WindowsSetup.App.csproj
-
-# Compilar (Release)
-dotnet publish src/WindowsSetup.App/WindowsSetup.App.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o Release
-
-# Criar instalador (requer Inno Setup 6)
-iscc setup.iss
-```
-
-- **Output:** `Release/L2Setup-Installer.exe`
-
-### Release Manager
-
-Use o `release-manager.bat` para automatizar builds e releases:
-
-```batch
-release-manager.bat
-```
-
-Opções:
-1. 📤 Quick Push (Git Add + Commit + Push)
-2. 🏗️  Build Project (Debug)
-3. 📦 Build Release (Production)
-4. 🚀 Create Installer
-5. ✨ Create GitHub Release
-6. ⚙️  Edit Configuration
-7. 📝 View Release Guide
-
-## 🔧 Tecnologias Utilizadas
-
-- **C# + WPF** (.NET 8)
-- **Material Design in XAML** (UI Framework)
-- **Winget** (Package Manager)
-- **Inno Setup** (Installer)
-- **PowerShell** (Windows Activation)
-- **SharpCompress** (Backup/Restore)
-- **System.Management** (GPU Detection)
-
-## 📁 Estrutura do Projeto
-
-```
-L2-Setup/
-├── src/
-│   └── WindowsSetup.App/         # Aplicação WPF principal
-│       ├── Models/                # Modelos de dados
-│       ├── Services/              # Lógica de negócio
-│       ├── Utils/                 # Utilitários
-│       ├── Views/                 # Janelas adicionais
-│       ├── MainWindow.xaml        # Janela principal
-│       └── App.xaml               # Application resources
-├── assets/                        # Ícones e recursos
-│   ├── icon.ico                  # Ícone da aplicação
-│   └── RunAsAdmin.bat            # Wrapper para elevação UAC
-├── Release/                       # Output da compilação
-│   ├── L2Setup.exe               # Executável principal
-│   └── L2Setup-Installer.exe     # Instalador Inno Setup
-├── setup.iss                      # Script Inno Setup
-├── release-config.json            # Configuração do release manager
-├── release-manager.bat            # Script de automação
-├── README.md                      # Documentação
-├── CHANGELOG.md                   # Histórico de mudanças
-├── LICENSE                        # Licença MIT
-└── .gitignore                     # Git ignore
-```
-
-## 🚨 Troubleshooting
-
-### Erro 740: The requested operation requires elevation
-
-**Solução:** O aplicativo sempre solicita permissões de administrador via UAC. Se o erro persistir:
-1. Clique com botão direito no atalho
-2. Selecione "Executar como administrador"
-
-### .NET 8 Runtime não detectado
-
-**Solução:** Use o instalador `L2Setup-Installer.exe` que instala automaticamente o .NET 8.
-
-### Winget não disponível
-
-**Solução:** 
-- Windows 10: Instale **App Installer** da Microsoft Store
-- Windows 11: Já vem pré-instalado
-
-### Falha ao instalar ferramentas
-
-**Solução:**
-- Verifique conexão com a internet
-- Execute como Administrador
-- Verifique logs na área de texto do aplicativo
-
-## 🤝 Contribuindo
-
-Contribuições são bem-vindas! Sinta-se à vontade para abrir uma Pull Request para **L2 Setup**.
-
-1. Fork o projeto
-2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
-3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
-4. Push para a branch (`git push origin feature/AmazingFeature`)
-5. Abra uma Pull Request
-
-## 📄 Licença
-
-Este projeto está licenciado sob a Licença MIT - veja o arquivo [LICENSE](LICENSE) para detalhes.
-
-## 🌟 Roadmap
-
-- [ ] Suporte para backup/restore de Chrome, Edge, Firefox
-- [ ] Interface multilíngue (EN, PT-BR, ES)
-- [ ] Perfis customizáveis de instalação
-- [ ] Integração com cloud storage (Google Drive, OneDrive)
-- [ ] Auto-update do aplicativo
-- [ ] Modo portable (sem instalação)
-- [ ] Estatísticas de uso e tempo economizado
+</div>
 
 ---
 
-**L2 Setup - Built with ❤️ by L2 for Windows automation**
+## 📋 Table of Contents
 
-**Repository:** https://github.com/theDAVIDL2/L2-Setup
+- [About](#-about)
+- [Features](#-features)
+- [Screenshots](#-screenshots)
+- [Installation](#-installation)
+- [Usage](#-usage)
+- [What Gets Installed](#-what-gets-installed)
+- [Optimizations](#-optimizations)
+- [Building from Source](#-building-from-source)
+- [Contributing](#-contributing)
+- [License](#-license)
+- [Support](#-support)
+
+---
+
+## 🎯 About
+
+**L2 Setup** is a professional Windows post-format automation tool designed to **save hours** of manual configuration. Whether you're a developer, gamer, or power user, this tool handles everything from installing 44+ essential applications to applying 50+ system optimizations.
+
+**⚠️ USE BEFORE & AFTER FORMATTING:**
+- **BEFORE**: Backup your browser profiles (Brave, Chrome, Edge, Firefox)
+- **AFTER**: Restore profiles and auto-install all your tools in one click!
+
+### 🏆 Why L2 Setup?
+
+| Feature | L2 Setup | Manual Setup | Other Tools |
+|---------|----------|--------------|-------------|
+| **Time Required** | 10-15 minutes | 3-5 hours | 1-2 hours |
+| **Tools Installed** | 44+ apps | One by one | Limited selection |
+| **Runtimes Included** | 30+ runtimes | Manual downloads | Not included |
+| **Browser Backup** | ✅ Full profile | ❌ Manual | ❌ Not supported |
+| **Windows Optimization** | 50+ tweaks | Manual registry | 20-35 tweaks |
+| **GPU Drivers** | Auto-detect & install | Manual search | ❌ Not supported |
+| **Windows Activation** | Integrated (MAS) | Manual scripting | ❌ Not included |
+| **Interface** | Modern WPF (Material Design) | N/A | Basic forms |
+
+---
+
+## ✨ Features
+
+### 🌐 Browser Management (PRE & POST FORMAT)
+
+<details>
+<summary><b>Click to expand Browser Features</b></summary>
+
+#### Before Formatting:
+- ✅ **Full Profile Backup** (Brave, Chrome, Edge, Firefox)
+  - Extensions, bookmarks, passwords, cookies, history
+  - Automatic ZIP compression for space efficiency
+  - Save to USB, external drive, or cloud storage
+  - Backup validation and integrity checks
+
+#### After Formatting:
+- ✅ **One-Click Profile Restore**
+  - Auto-detection of backup files on USB drives
+  - Complete profile restoration with all settings
+  - Automatic browser installation if not present
+  - Set Brave as default browser automatically
+
+</details>
+
+### 🛠️ Application Installation
+
+<details>
+<summary><b>Click to expand 44+ Tools</b></summary>
+
+#### Development Tools (18 apps):
+- **Version Control**: Git, GitHub Desktop
+- **Languages**: Python 3.13, Node.js LTS, Rust, Go
+- **Java**: Amazon Corretto 8, 17, 21 LTS
+- **IDEs**: VS Code, Cursor, Visual Studio 2022 Community
+- **Editors**: Notepad++, IntelliJ IDEA, PyCharm Community
+- **Package Managers**: Yarn, pnpm, Bun, Composer
+- **Tools**: .NET 8 SDK, Inno Setup 6
+
+#### Networking & API (4 apps):
+- Postman, DBeaver, FileZilla, PuTTY
+
+#### Browsers (2 apps):
+- Brave Browser (auto-configured as default)
+- Comet (Perplexity AI Browser)
+
+#### Gaming & Communication (2 apps):
+- Discord, Steam
+
+#### Utilities (11 apps):
+- WinRAR (auto-activated with license key)
+- Lightshot (screenshot tool)
+- JDownloader 2 (download manager)
+- System Informer (task manager alternative)
+- IObit Unlocker (file unlocker)
+- MSI Afterburner (GPU monitoring)
+- Logitech G Hub (peripheral software)
+- AdsPower (multi-account browser)
+- 7-Zip, Everything (search)
+- ShareX (advanced screenshots)
+
+#### Java & Minecraft:
+- Java 21 (Minecraft-compatible runtime)
+- OpenJDK 21 with JavaFX
+
+</details>
+
+### ⚡ Windows Optimizations (50+ Tweaks)
+
+<details>
+<summary><b>Click to expand Optimization Categories</b></summary>
+
+#### 🚀 Performance (9 tweaks):
+- High Performance Power Plan
+- Disable Mouse Acceleration
+- Optimize Visual Effects
+- Optimize File Explorer
+- Disable Background Apps ⭐ NEW
+- Disable Transparency Effects ⭐ NEW
+- Disable Windows Animations ⭐ NEW
+- Optimize Page File/Virtual Memory
+- Disable Unnecessary Startup Programs
+
+#### 🔒 Privacy & Telemetry (7 tweaks):
+- Disable Windows Telemetry
+- Disable Cortana
+- Disable Advertising ID
+- Disable Location Tracking
+- Disable Diagnostic Data Collection
+- Disable Activity History ⭐ NEW
+- Disable Web Search in Start Menu ⭐ NEW
+
+#### 🎮 Gaming Optimizations (7 tweaks):
+- Enable Game Mode
+- Disable Game Bar
+- Disable Game DVR
+- Enable Hardware-accelerated GPU Scheduling
+- Disable Fullscreen Optimizations ⭐ NEW
+- Optimize CPU Scheduling for Games ⭐ NEW
+- Disable Nagle Algorithm (Lower Latency) ⭐ NEW
+
+#### 🌐 Network Optimizations (5 tweaks): ⭐ ALL NEW
+- Optimize TCP/IP Stack
+- Set Cloudflare DNS (1.1.1.1)
+- Disable Network Throttling
+- Optimize Network Adapter Settings
+- Disable Large Send Offload
+
+#### 🗑️ Debloat & Cleanup (7 tweaks):
+- Clean Temporary Files
+- Remove Bloatware Apps (27 apps: Xbox, Teams, OneDrive, etc.) ⭐ NEW
+- Disable Windows 11 Widgets ⭐ NEW
+- Remove Windows CoPilot ⭐ NEW
+- Disable Chat Icon (Teams) ⭐ NEW
+- Empty Recycle Bin
+- Remove Windows.old Folder
+
+#### 💾 Storage & Memory (5 tweaks): ⭐ ALL NEW
+- Disable Search Indexing
+- Optimize SSD (Enable TRIM)
+- Disable System Restore (Frees Space)
+- Compact OS (Compress Windows)
+- Disable Prefetch
+
+#### 🖥️ CPU & Memory (5 tweaks): ⭐ ALL NEW
+- Disable CPU Core Parking
+- Optimize Processor Scheduling
+- Optimize Memory Management
+- Disable Write Cache Buffer Flushing
+- ⚠️ Disable Spectre/Meltdown (EXPERT - Security Risk!)
+
+#### 🎨 UI & Visual Tweaks (7 tweaks):
+- Show File Extensions
+- Show Hidden Files
+- Disable Lock Screen ⭐ NEW
+- Disable Action Center
+- Classic Context Menu (Windows 11) ⭐ NEW
+- Move Taskbar to Left (Windows 11)
+- Disable Snap Assist
+
+#### ⚡ Advanced & Expert (6 tweaks):
+- ✅ Create System Restore Point (RECOMMENDED)
+- Disable OneDrive
+- Disable Hibernation (Frees Space)
+- Disable Fast Startup ⭐ NEW
+- Disable Remote Assistance ⭐ NEW
+- Disable Error Reporting ⭐ NEW
+
+**Total: 50+ Optimizations!** (⭐ NEW = 22 new tweaks in latest version)
+
+</details>
+
+### 🎯 All-in-One Runtimes (30+ Packages)
+
+<details>
+<summary><b>Click to expand Runtimes List</b></summary>
+
+#### Visual C++ Redistributables:
+- 2005, 2008, 2010, 2012, 2013, 2015-2022 (x86 & x64)
+
+#### .NET Framework:
+- 3.5, 4.5.2, 4.6.2, 4.7.2, 4.8, 4.8.1
+
+#### .NET Modern Runtimes:
+- .NET 5.0, 6.0, 7.0, 8.0 (Desktop & ASP.NET Core)
+
+#### Graphics & Gaming:
+- DirectX End-User Runtime (June 2010)
+- XNA Framework 4.0 Redistributable
+- OpenAL (audio library)
+
+#### Java Runtimes:
+- Java 8 LTS (legacy support)
+- Java 21 LTS (latest, Minecraft-compatible)
+
+#### Development:
+- Visual Studio Tools for Office (VSTO)
+
+#### Optional:
+- K-Lite Codec Pack (media codecs)
+
+**Automatic Installation & Cleanup:**
+- Silent installations (no user interaction)
+- Multi-threaded downloads for speed
+- Automatic cleanup of installer files
+- Progress tracking and error handling
+
+</details>
+
+### 🎮 GPU Driver Detection
+
+- **Auto-detects GPU vendor**: NVIDIA, AMD, Intel
+- **Opens driver download page** automatically
+- **Provides direct links** to latest drivers
+- **Manual installation guidance** included
+
+### 🔑 Windows Activation
+
+- **Microsoft Activation Scripts (MAS)** integration
+- **HWID Activation** (permanent, digital license)
+- **Clear instructions** for manual interaction if needed
+- **Status verification** after activation
+
+### ⚙️ Additional Features
+
+- ✅ **WinRAR Auto-Activation**: Automatically creates license key file
+- ✅ **Material Design UI**: Modern, intuitive interface
+- ✅ **Tabbed Interface**: Quick Setup, Custom Selection, Browser, Optimization
+- ✅ **Progress Tracking**: Real-time logs and status updates
+- ✅ **Error Handling**: Robust error recovery and detailed logging
+- ✅ **Admin Privileges**: Automatic elevation via RunAsAdmin.bat
+- ✅ **Self-Contained**: Single executable, no dependencies
+
+---
+
+## 📸 Screenshots
+
+<div align="center">
+
+### Main Interface
+![Main Window](docs/images/main-window.png)
+
+### Optimization Settings
+![Optimization Window](docs/images/optimization-window.png)
+
+### Browser Backup
+![Browser Backup](docs/images/browser-backup.png)
+
+</div>
+
+---
+
+## 📥 Installation
+
+### Option 1: Installer (Recommended)
+
+1. Download **[L2Setup-Installer.exe](https://github.com/theDAVIDL2/L2-Setup/releases/latest)** (~49 MB)
+2. Run the installer (requires Administrator privileges)
+3. **Auto-installs .NET 8 Runtime** if not present (no user interaction required)
+4. Launch from Start Menu or Desktop shortcut
+
+### Option 2: Standalone Executable
+
+1. Download **[L2Setup.exe](https://github.com/theDAVIDL2/L2-Setup/releases/latest)** (~166 MB)
+2. Requires **.NET 8 Runtime** (auto-detected, download link provided if missing)
+3. Run directly (no installation needed)
+
+### System Requirements
+
+- **OS**: Windows 10 (1809+) or Windows 11
+- **RAM**: 4 GB minimum (8 GB recommended)
+- **Storage**: 10 GB free space for tools and runtimes
+- **Internet**: Required for downloads
+- **.NET**: 8.0 Runtime (auto-installed by installer)
+
+---
+
+## 🚀 Usage
+
+### Quick Start Guide
+
+#### Before Formatting:
+
+```
+1. Launch L2 Setup
+2. Go to "Browser Management" tab
+3. Click "Backup Brave Profile" (or other browsers)
+4. Save to USB/External Drive/Cloud
+5. Format your PC confidently!
+```
+
+#### After Formatting:
+
+```
+1. Install L2 Setup
+2. Go to "Quick Setup" tab
+3. Click "Install All" (or select custom tools)
+4. Go to "Browser Management" tab
+5. Click "Restore Brave Profile"
+6. Go to "Windows Optimization" tab
+7. Select optimizations (or use preset)
+8. Click "Apply Optimizations"
+9. Optional: Activate Windows
+10. Reboot and enjoy!
+```
+
+### Optimization Presets
+
+- **Recommended (Safe)**: Balanced performance and stability
+- **Gaming Optimized**: Maximum gaming performance
+- **Max Performance**: All performance tweaks (expert users)
+
+---
+
+## 📦 What Gets Installed
+
+### Essential Apps (Auto-Install)
+- Git (version control)
+- Python 3.13 (programming language)
+- Node.js LTS (JavaScript runtime)
+- Visual Studio Code (code editor)
+
+### Optional Apps (Custom Selection)
+- **44+ tools** across categories (see [Features](#-features))
+- **30+ runtimes** for compatibility
+- **GPU drivers** based on your hardware
+
+---
+
+## ⚙️ Optimizations
+
+### How Optimizations Work
+
+1. **System Restore Point** created automatically (if enabled)
+2. **Registry tweaks** applied with error handling
+3. **Services disabled/modified** as per selection
+4. **Cleanup tasks** executed (temp files, cache)
+5. **Network settings** optimized
+6. **Detailed logs** for troubleshooting
+
+### Safety Features
+
+- ✅ **Restore Point** created before changes
+- ✅ **Selective application** (choose what you want)
+- ✅ **Undo instructions** provided
+- ✅ **No dangerous tweaks** enabled by default
+- ⚠️ **Expert options** clearly marked with warnings
+
+---
+
+## 🔨 Building from Source
+
+### Prerequisites
+
+- **Windows 10/11** (build environment)
+- **.NET 8 SDK** ([Download](https://dotnet.microsoft.com/download/dotnet/8.0))
+- **Visual Studio 2022** or **VS Code** (optional, but recommended)
+- **Inno Setup 6** (for installer creation)
+- **Git** (version control)
+
+### Clone & Build
+
+```bash
+# Clone the repository
+git clone https://github.com/theDAVIDL2/L2-Setup.git
+cd L2-Setup
+
+# Restore dependencies
+dotnet restore src/WindowsSetup.App/WindowsSetup.App.csproj
+
+# Build (Debug)
+dotnet build src/WindowsSetup.App/WindowsSetup.App.csproj --configuration Debug
+
+# Build (Release)
+dotnet build src/WindowsSetup.App/WindowsSetup.App.csproj --configuration Release
+
+# Run
+cd src/WindowsSetup.App/bin/Release/net8.0-windows/win-x64
+./L2Setup.exe
+```
+
+### Create Installer
+
+```bash
+# Compile with Inno Setup
+iscc setup.iss
+
+# Output: Release/L2Setup-Installer.exe
+```
+
+For detailed build instructions, see [BUILDING.md](docs/BUILDING.md).
+
+---
+
+## 🤝 Contributing
+
+We welcome contributions! Whether it's bug reports, feature requests, or code contributions, we appreciate your help.
+
+### How to Contribute
+
+1. **Fork** the repository
+2. **Create** a feature branch (`git checkout -b feature/AmazingFeature`)
+3. **Commit** your changes (`git commit -m 'Add some AmazingFeature'`)
+4. **Push** to the branch (`git push origin feature/AmazingFeature`)
+5. **Open** a Pull Request
+
+For detailed guidelines, see [CONTRIBUTING.md](docs/CONTRIBUTING.md).
+
+### Code of Conduct
+
+This project adheres to a [Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code.
+
+---
+
+## 📄 License
+
+This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
+
+### Third-Party Licenses
+
+- **Material Design In XAML Toolkit**: MIT License
+- **SharpCompress**: MIT License
+- **Newtonsoft.Json**: MIT License
+- **Microsoft Activation Scripts (MAS)**: GPL-3.0 (external, not bundled)
+
+---
+
+## 💬 Support
+
+### Need Help?
+
+- 🐛 **Bug Reports**: [GitHub Issues](https://github.com/theDAVIDL2/L2-Setup/issues)
+- 💡 **Feature Requests**: [GitHub Issues](https://github.com/theDAVIDL2/L2-Setup/issues)
+- 📖 **Documentation**: [docs/](docs/)
+- 💬 **Discussions**: [GitHub Discussions](https://github.com/theDAVIDL2/L2-Setup/discussions)
+
+### FAQ
+
+<details>
+<summary><b>Q: Do I need to install .NET 8 separately?</b></summary>
+
+A: No! The installer (`L2Setup-Installer.exe`) automatically detects and installs .NET 8 Runtime if not present. If using the standalone executable, a download link will be provided if needed.
+</details>
+
+<details>
+<summary><b>Q: Are the optimizations safe?</b></summary>
+
+A: Yes! All optimizations are tested and safe. Expert/dangerous options are clearly marked with warnings. A system restore point is created before applying changes.
+</details>
+
+<details>
+<summary><b>Q: Can I undo optimizations?</b></summary>
+
+A: Yes! You can restore from the system restore point created before optimizations. Some tweaks can also be manually reverted (documented in logs).
+</details>
+
+<details>
+<summary><b>Q: Why does it need Administrator privileges?</b></summary>
+
+A: Admin rights are required for:
+- Installing applications
+- Modifying system settings
+- Applying registry tweaks
+- Changing services
+</details>
+
+<details>
+<summary><b>Q: How long does the full setup take?</b></summary>
+
+A: Typically 10-15 minutes for:
+- Installing 44+ apps: 5-8 minutes
+- Installing 30+ runtimes: 3-5 minutes
+- Applying optimizations: 1-2 minutes
+</details>
+
+---
+
+## 🌟 Acknowledgments
+
+This project was inspired by and combines best practices from:
+
+- [ET-Optimizer](https://github.com/semazurek/ET-Optimizer) - CPU & Gaming tweaks
+- [windows-11-debloat](https://github.com/teeotsa/windows-11-debloat) - Debloat strategies
+- [RyTuneX](https://github.com/rayenghanmi/RyTuneX) - Network optimizations
+- [XToolbox](https://github.com/nyxiereal/XToolbox) - UI tweaks
+- [vacisdev/windows11](https://github.com/vacisdev/windows11) - Privacy tweaks
+- [Microsoft Activation Scripts](https://massgrave.dev/) - Windows activation
+
+Special thanks to all contributors and the open-source community!
+
+---
+
+## 📊 Project Stats
+
+![GitHub repo size](https://img.shields.io/github/repo-size/theDAVIDL2/L2-Setup)
+![GitHub code size](https://img.shields.io/github/languages/code-size/theDAVIDL2/L2-Setup)
+![GitHub language count](https://img.shields.io/github/languages/count/theDAVIDL2/L2-Setup)
+![GitHub top language](https://img.shields.io/github/languages/top/theDAVIDL2/L2-Setup)
+![GitHub last commit](https://img.shields.io/github/last-commit/theDAVIDL2/L2-Setup)
+
+---
+
+<div align="center">
+
+## 🎉 Made with ❤️ by [L2 - theDAVIDL2](https://github.com/theDAVIDL2)
+
+**⭐ If you find this project useful, consider giving it a star!**
+
+[🏠 Homepage](https://github.com/theDAVIDL2/L2-Setup) • [📥 Download](https://github.com/theDAVIDL2/L2-Setup/releases) • [📖 Documentation](docs/) • [🐛 Issues](https://github.com/theDAVIDL2/L2-Setup/issues)
+
+</div>

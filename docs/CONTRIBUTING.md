@@ -1,4 +1,4 @@
-# Contributing to Windows Post-Format Setup Tool
+# Contributing to L2 SETUP
 
 First off, thank you for considering contributing to this project! 🎉
 
@@ -56,11 +56,11 @@ Enhancement suggestions are tracked as GitHub issues. When creating an enhanceme
 
 ```bash
 # Clone your fork
-git clone https://github.com/YOUR-USERNAME/windows-post-format-setup.git
-cd windows-post-format-setup
+git clone https://github.com/YOUR-USERNAME/L2-Setup.git
+cd L2-Setup
 
 # Add upstream remote
-git remote add upstream https://github.com/ORIGINAL-OWNER/windows-post-format-setup.git
+git remote add upstream https://github.com/theDAVIDL2/L2-Setup.git
 
 # Install dependencies
 dotnet restore src/WindowsSetup.App/WindowsSetup.App.csproj
@@ -142,7 +142,7 @@ Fixes #123
 ## Project Structure
 
 ```
-windows-post-format-setup/
+L2-Setup/
 ├── src/
 │   └── WindowsSetup.App/
 │       ├── Services/       # Business logic
