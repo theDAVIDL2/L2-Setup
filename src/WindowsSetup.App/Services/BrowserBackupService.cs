@@ -61,9 +61,8 @@ namespace WindowsSetup.App.Services
                     using var archive = ZipArchive.Create();
                     AddDirectoryToArchive(archive, _bravePath, "User Data");
                     
-                    using var writer = WriterFactory.Open(new FileStream(destinationPath, FileMode.Create), 
-                        ArchiveType.Zip, new WriterOptions(CompressionType.Deflate) { LeaveStreamOpen = false });
-                    archive.SaveTo(writer);
+                    using var stream = new FileStream(destinationPath, FileMode.Create);
+                    archive.SaveTo(stream, new WriterOptions(CompressionType.Deflate) { LeaveStreamOpen = false });
                 });
 
                 // Get file info

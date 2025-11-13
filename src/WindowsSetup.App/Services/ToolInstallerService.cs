@@ -58,6 +58,17 @@ namespace WindowsSetup.App.Services
             await InstallTools(allTools);
         }
 
+        public List<ToolDefinition> GetAllToolsList()
+        {
+            return GetAllToolDefinitions();
+        }
+
+        public async Task InstallCustomTools(List<ToolDefinition> tools)
+        {
+            _logger.LogInfo($"=== Installing {tools.Count} Custom Selected Tools ===");
+            await InstallTools(tools);
+        }
+
         private List<ToolDefinition> GetAllToolDefinitions()
         {
             return new List<ToolDefinition>
@@ -76,13 +87,24 @@ namespace WindowsSetup.App.Services
                 
                 // Browsers
                 new() { Name = "Brave Browser", WingetId = "Brave.Brave", Priority = 20, Essential = true },
+                new() { Name = "Comet (Perplexity)", Method = "direct", 
+                    DirectUrl = "https://downloads.perplexity.ai/comet/CometSetup-latest.exe", 
+                    SilentArgs = "/S", Priority = 21 },
                 
-                // JDKs
-                new() { Name = "Amazon Corretto 8", WingetId = "Amazon.Corretto.8", Priority = 30 },
-                new() { Name = "Amazon Corretto 17", WingetId = "Amazon.Corretto.17", Priority = 31 },
+                // Additional Programming Languages
+                new() { Name = "Rust", WingetId = "Rustlang.Rust.MSVC", Priority = 28 },
+                new() { Name = "Go", WingetId = "GoLang.Go", Priority = 29 },
                 
-                // Package Managers
+                // JDKs & Java Runtimes
+                new() { Name = "Java 21 (Minecraft Compatible)", WingetId = "Oracle.JavaRuntimeEnvironment", Priority = 30 },
+                new() { Name = "Amazon Corretto 8", WingetId = "Amazon.Corretto.8", Priority = 31 },
+                new() { Name = "Amazon Corretto 17", WingetId = "Amazon.Corretto.17", Priority = 32 },
+                new() { Name = "Amazon Corretto 21", WingetId = "Amazon.Corretto.21", Priority = 33 },
+                
+                // Package Managers & Build Tools
                 new() { Name = "Yarn", WingetId = "Yarn.Yarn", Priority = 40 },
+                new() { Name = "pnpm", WingetId = "pnpm.pnpm", Priority = 41 },
+                new() { Name = "Bun", WingetId = "Oven-sh.Bun", Priority = 42 },
                 
                 // Communication & Gaming
                 new() { Name = "Discord", WingetId = "Discord.Discord", Priority = 50 },
@@ -96,11 +118,23 @@ namespace WindowsSetup.App.Services
                 // System Tools
                 new() { Name = "System Informer", Method = "direct", DirectUrl = "https://github.com/winsiderss/systeminformer/releases/download/v3.1.24274/systeminformer-3.1.24274-release-setup.exe", SilentArgs = "/VERYSILENT", Priority = 70 },
                 
+                // Development SDKs & Tools (Release Guide Requirements)
+                new() { Name = ".NET 8 SDK", WingetId = "Microsoft.DotNet.SDK.8", Priority = 75 },
+                new() { Name = "Visual Studio 2022 Community", WingetId = "Microsoft.VisualStudio.2022.Community", Priority = 76 },
+                new() { Name = "Inno Setup 6", WingetId = "JRSoftware.InnoSetup", Priority = 77 },
+                
+                // .NET Runtimes (5-10 for compatibility)
+                new() { Name = ".NET Runtime 5.0", WingetId = "Microsoft.DotNet.Runtime.5", Priority = 78 },
+                new() { Name = ".NET Runtime 6.0", WingetId = "Microsoft.DotNet.Runtime.6", Priority = 79 },
+                new() { Name = ".NET Runtime 7.0", WingetId = "Microsoft.DotNet.Runtime.7", Priority = 80 },
+                new() { Name = ".NET Runtime 8.0", WingetId = "Microsoft.DotNet.Runtime.8", Priority = 81 },
+                
                 // Development Tools
-                new() { Name = "Postman", WingetId = "Postman.Postman", Priority = 80 },
-                new() { Name = "DBeaver", WingetId = "dbeaver.dbeaver", Priority = 81 },
-                new() { Name = "FileZilla", WingetId = "FileZilla.FileZilla", Priority = 82 },
-                new() { Name = "PuTTY", WingetId = "PuTTY.PuTTY", Priority = 83 },
+                new() { Name = "Postman", WingetId = "Postman.Postman", Priority = 90 },
+                new() { Name = "DBeaver", WingetId = "dbeaver.dbeaver", Priority = 91 },
+                new() { Name = "FileZilla", WingetId = "FileZilla.FileZilla", Priority = 92 },
+                new() { Name = "PuTTY", WingetId = "PuTTY.PuTTY", Priority = 93 },
+                new() { Name = "GitHub Desktop", WingetId = "GitHub.GitHubDesktop", Priority = 94 },
                 
                 // Runtimes (install after applications)
                 new() { Name = "Microsoft Visual C++ 2015-2022 x64", WingetId = "Microsoft.VCRedist.2015+.x64", Priority = 100 },
@@ -286,6 +320,48 @@ namespace WindowsSetup.App.Services
             };
 
             await InstallTools(runtimes);
+        }
+
+        public async Task InstallGPUDrivers()
+        {
+            try
+            {
+                _logger.LogInfo("=== Installing GPU Drivers ===");
+                
+                var gpuService = new GPUDetectionService(_logger);
+                var gpuInfo = gpuService.DetectGPU();
+
+                if (gpuInfo.Vendor == GPUDetectionService.GPUVendor.Unknown)
+                {
+                    _logger.LogWarning("Could not detect GPU. Please install drivers manually.");
+                    _logger.LogInfo("GPU Driver links:");
+                    _logger.LogInfo("  NVIDIA: https://www.nvidia.com/Download/index.aspx");
+                    _logger.LogInfo("  AMD: https://www.amd.com/en/support");
+                    _logger.LogInfo("  Intel: https://www.intel.com/content/www/us/en/download-center/home.html");
+                    return;
+                }
+
+                _logger.LogInfo($"Detected: {gpuInfo.Name}");
+                _logger.LogInfo($"Vendor: {gpuInfo.Vendor}");
+                _logger.LogInfo($"Current Driver: {gpuInfo.DriverVersion}");
+
+                var success = await gpuService.DownloadAndInstallDrivers(gpuInfo.Vendor, _progressCallback);
+
+                if (success)
+                {
+                    _logger.LogSuccess("GPU drivers installed successfully!");
+                    _logger.LogInfo(gpuService.GetDriverInstallationInstructions(gpuInfo.Vendor));
+                }
+                else
+                {
+                    _logger.LogWarning("Could not install GPU drivers automatically.");
+                    _logger.LogInfo($"Please visit: {gpuService.GetDriverDownloadUrl(gpuInfo.Vendor)}");
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error installing GPU drivers: {ex.Message}");
+            }
         }
 
         private async Task ActivateWinRAR()

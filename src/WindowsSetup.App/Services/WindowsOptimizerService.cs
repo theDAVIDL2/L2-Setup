@@ -7,7 +7,7 @@ using WindowsSetup.App.Utils;
 
 namespace WindowsSetup.App.Services
 {
-    public class WindowsOptimizerService
+    public partial class WindowsOptimizerService
     {
         private readonly Logger _logger;
         private readonly CommandRunner _commandRunner;

@@ -1,0 +1,43 @@
+{
+  "_comment": "COPY THIS FILE TO 'release-config.json' AND CONFIGURE FOR YOUR PROJECT",
+  
+  "project": {
+    "name": "Your Project Name",
+    "shortName": "your-project",
+    "version": "1.0.0",
+    "description": "Your project description"
+  },
+  "repository": {
+    "url": "https://github.com/your-username/your-repo",
+    "owner": "your-username",
+    "name": "your-repo",
+    "defaultBranch": "main"
+  },
+  "author": {
+    "name": "Your Name",
+    "email": "your-email@example.com"
+  },
+  "build": {
+    "solutionFile": "YourProject.sln",
+    "projectDir": "src/YourProject",
+    "projectFile": "src/YourProject/YourProject.csproj",
+    "outputDir": "Release",
+    "installerScript": "setup.iss",
+    "installerOutputDir": "Output"
+  },
+  "features": {
+    "enableInnoSetup": true,
+    "enableAutoPublish": true,
+    "requireConfirmation": true,
+    "createBackups": true
+  },
+  "advanced": {
+    "tempDir": ".release-manager",
+    "logFile": ".release-manager/release.log",
+    "stateFile": ".release-manager/state.json",
+    "dotnetVersion": "8.0",
+    "targetRuntime": "win-x64",
+    "publishSingleFile": true
+  }
+}
+

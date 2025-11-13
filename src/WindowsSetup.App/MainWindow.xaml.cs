@@ -1,7 +1,10 @@
 using System;
-using System.IO;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Media;
+using System.Windows.Controls;
+using WindowsSetup.App.Models;
 using WindowsSetup.App.Services;
 using WindowsSetup.App.Utils;
 
@@ -9,329 +12,436 @@ namespace WindowsSetup.App
 {
     public partial class MainWindow : Window
     {
-        private readonly BrowserBackupService _browserService;
-        private readonly ToolInstallerService _toolInstaller;
-        private readonly WindowsOptimizerService _optimizer;
-        private readonly WindowsActivationService _activation;
         private readonly Logger _logger;
+        private readonly ToolInstallerService? _toolInstaller;
+        private readonly BrowserBackupService? _browserBackup;
+        private readonly WindowsOptimizerService? _windowsOptimizer;
+        private readonly WindowsActivationService? _windowsActivation;
+        private readonly RuntimeInstallerService? _runtimeInstaller;
+        private readonly List<ToolCheckBox> _toolCheckBoxes;
+
+        private class ToolCheckBox
+        {
+            public CheckBox? CheckBox { get; set; }
+            public ToolDefinition? Tool { get; set; }
+        }
 
         public MainWindow()
         {
             InitializeComponent();
 
-            _logger = new Logger(LogMessage);
-            _browserService = new BrowserBackupService(_logger);
-            _toolInstaller = new ToolInstallerService(_logger, UpdateProgress);
-            _optimizer = new WindowsOptimizerService(_logger);
-            _activation = new WindowsActivationService(_logger);
+            _logger = new Logger(Log);
+            _toolCheckBoxes = new List<ToolCheckBox>();
 
-            _logger.LogInfo("Windows Post-Format Setup Tool initialized");
-            _logger.LogInfo($"Running as Administrator: {AdminHelper.IsAdministrator()}");
+            try
+            {
+                _toolInstaller = new ToolInstallerService(_logger, UpdateProgress);
+                _browserBackup = new BrowserBackupService(_logger);
+                _windowsOptimizer = new WindowsOptimizerService(_logger);
+                _windowsActivation = new WindowsActivationService(_logger);
+                _runtimeInstaller = new RuntimeInstallerService(_logger, UpdateProgress);
+
+                InitializeCustomToolsList();
+
+                _logger.LogSuccess("Application initialized successfully!");
+                _logger.LogInfo("Select an option to begin...");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Initialization error: {ex.Message}", "Error", 
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
-        private void LogMessage(string message, LogLevel level)
+        private void InitializeCustomToolsList()
+        {
+            try
+            {
+                if (_toolInstaller == null) return;
+
+                var allTools = _toolInstaller.GetAllToolsList();
+                
+                // Group tools by category
+                var categories = new Dictionary<string, List<ToolDefinition>>
+                {
+                    ["Essentials"] = allTools.Where(t => t.Essential).ToList(),
+                    ["IDEs & Editors"] = allTools.Where(t => t.Priority >= 10 && t.Priority < 20).ToList(),
+                    ["Browsers"] = allTools.Where(t => t.Priority >= 20 && t.Priority < 28).ToList(),
+                    ["Languages"] = allTools.Where(t => t.Priority >= 28 && t.Priority < 40).ToList(),
+                    ["Package Managers"] = allTools.Where(t => t.Priority >= 40 && t.Priority < 50).ToList(),
+                    ["Gaming & Communication"] = allTools.Where(t => t.Priority >= 50 && t.Priority < 60).ToList(),
+                    ["Utilities"] = allTools.Where(t => t.Priority >= 60 && t.Priority < 70).ToList(),
+                    ["Development Tools"] = allTools.Where(t => t.Priority >= 75 && t.Priority < 100).ToList(),
+                    ["Runtimes"] = allTools.Where(t => t.Priority >= 100).ToList()
+                };
+
+                foreach (var category in categories)
+                {
+                    if (category.Value.Any())
+                    {
+                        // Category header
+                        var header = new TextBlock
+                        {
+                            Text = category.Key,
+                            FontSize = 16,
+                            FontWeight = FontWeights.Bold,
+                            Margin = new Thickness(0, 10, 0, 5)
+                        };
+                        CustomToolsList.Children.Add(header);
+
+                        // Tools in category
+                        foreach (var tool in category.Value.OrderBy(t => t.Priority))
+                        {
+                            var checkBox = new CheckBox
+                            {
+                                Content = tool.Name,
+                                Margin = new Thickness(20, 2, 0, 2),
+                                IsChecked = tool.Essential
+                            };
+
+                            _toolCheckBoxes.Add(new ToolCheckBox
+                            {
+                                CheckBox = checkBox,
+                                Tool = tool
+                            });
+
+                            CustomToolsList.Children.Add(checkBox);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error initializing tools list: {ex.Message}");
+            }
+        }
+
+        private void Log(string message)
         {
             Dispatcher.Invoke(() =>
             {
-                var timestamp = DateTime.Now.ToString("HH:mm:ss");
-                var color = level switch
-                {
-                    LogLevel.Info => "#2196F3",
-                    LogLevel.Success => "#4CAF50",
-                    LogLevel.Warning => "#FF9800",
-                    LogLevel.Error => "#F44336",
-                    _ => "#000000"
-                };
-
-                LogTextBox.AppendText($"[{timestamp}] {message}\n");
+                LogTextBox.AppendText($"{DateTime.Now:HH:mm:ss} - {message}\n");
                 LogTextBox.ScrollToEnd();
             });
         }
 
-        private void UpdateProgress(int percentage, string status)
+        private void UpdateProgress(int percentage, string message)
         {
             Dispatcher.Invoke(() =>
             {
-                ProgressBar.Value = percentage;
-                ProgressText.Text = $"Progress: {percentage}%";
-                StatusText.Text = status;
+                Log($"[{percentage}%] {message}");
             });
         }
 
-        private async void BackupBraveButton_Click(object sender, RoutedEventArgs e)
+        // Quick Setup Handlers
+        private async void InstallEssentials_Click(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                _logger.LogInfo("Starting Brave profile backup...");
-                UpdateProgress(0, "Preparing backup...");
-
-                var dialog = new Microsoft.Win32.SaveFileDialog
-                {
-                    FileName = $"Brave_Backup_{DateTime.Now:yyyy-MM-dd_HHmmss}",
-                    DefaultExt = ".zip",
-                    Filter = "Backup files (*.zip)|*.zip"
-                };
-
-                if (dialog.ShowDialog() == true)
-                {
-                    var result = await _browserService.BackupBraveProfile(dialog.FileName);
-                    
-                    if (result.Success)
-                    {
-                        _logger.LogSuccess($"Backup completed successfully! Saved to: {dialog.FileName}");
-                        MessageBox.Show($"Backup completed!\n\nSize: {result.SizeInMB:F2} MB\nExtensions: {result.ExtensionsCount}\nLocation: {dialog.FileName}",
-                            "Backup Successful", MessageBoxButton.OK, MessageBoxImage.Information);
-                    }
-                    else
-                    {
-                        _logger.LogError($"Backup failed: {result.ErrorMessage}");
-                        MessageBox.Show($"Backup failed:\n{result.ErrorMessage}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                    }
-                }
-
-                UpdateProgress(100, "Ready");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Backup error: {ex.Message}");
-                MessageBox.Show($"Error during backup:\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
-
-        private async void RestoreBraveButton_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                var dialog = new Microsoft.Win32.OpenFileDialog
-                {
-                    DefaultExt = ".zip",
-                    Filter = "Backup files (*.zip)|*.zip"
-                };
-
-                if (dialog.ShowDialog() == true)
-                {
-                    _logger.LogInfo("Starting Brave profile restore...");
-                    UpdateProgress(0, "Restoring backup...");
-
-                    var result = await _browserService.RestoreBraveProfile(dialog.FileName);
-                    
-                    if (result.Success)
-                    {
-                        _logger.LogSuccess("Restore completed successfully!");
-                        MessageBox.Show("Profile restored successfully!\n\nYou can now open Brave Browser.",
-                            "Restore Successful", MessageBoxButton.OK, MessageBoxImage.Information);
-                    }
-                    else
-                    {
-                        _logger.LogError($"Restore failed: {result.ErrorMessage}");
-                        MessageBox.Show($"Restore failed:\n{result.ErrorMessage}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                    }
-                }
-
-                UpdateProgress(100, "Ready");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Restore error: {ex.Message}");
-                MessageBox.Show($"Error during restore:\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
-
-        private async void SetBraveDefaultButton_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                _logger.LogInfo("Setting Brave as default browser...");
-                await _browserService.SetBraveAsDefaultBrowser();
-                _logger.LogSuccess("Brave set as default browser!");
-                MessageBox.Show("Brave has been set as your default browser!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error setting default browser: {ex.Message}");
-                MessageBox.Show($"Error:\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
-
-        private async void InstallEssentialsButton_Click(object sender, RoutedEventArgs e)
-        {
-            try
+            if (_toolInstaller == null) return;
+            await ExecuteSafe(async () =>
             {
                 _logger.LogInfo("Starting essential tools installation...");
                 await _toolInstaller.InstallEssentialTools();
-                _logger.LogSuccess("Essential tools installed successfully!");
-                MessageBox.Show("Essential tools have been installed!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Installation error: {ex.Message}");
-                MessageBox.Show($"Error:\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+                _logger.LogSuccess("Essential tools installation complete!");
+                MessageBox.Show("Essential tools installed successfully!", "Success", 
+                    MessageBoxButton.OK, MessageBoxImage.Information);
+            });
         }
 
-        private async void InstallAllButton_Click(object sender, RoutedEventArgs e)
+        private async void InstallAll_Click(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                var result = MessageBox.Show(
-                    "This will install ALL tools and may take 30-60 minutes.\n\nDo you want to continue?",
-                    "Install All Tools",
-                    MessageBoxButton.YesNo,
-                    MessageBoxImage.Question);
+            if (_toolInstaller == null) return;
 
-                if (result == MessageBoxResult.Yes)
+            var result = MessageBox.Show(
+                "This will install 44+ tools. This may take 40-60 minutes.\nContinue?",
+                "Confirm", MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+            if (result == MessageBoxResult.Yes)
+            {
+                await ExecuteSafe(async () =>
                 {
                     _logger.LogInfo("Starting full installation...");
+                    
+                    // Install tools
                     await _toolInstaller.InstallAllTools();
-                    _logger.LogSuccess("All tools installed successfully!");
-                    MessageBox.Show("All tools have been installed!\n\nA restart is recommended.",
-                        "Success", MessageBoxButton.OK, MessageBoxImage.Information);
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Installation error: {ex.Message}");
-                MessageBox.Show($"Error:\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    
+                    // Install ALL runtimes (All-in-One)
+                    if (_runtimeInstaller != null)
+                    {
+                        _logger.LogInfo("Installing ALL runtimes (All-in-One)...");
+                        await _runtimeInstaller.InstallAllRuntimes();
+                    }
+                    
+                    // Install GPU drivers
+                    await _toolInstaller.InstallGPUDrivers();
+                    
+                    _logger.LogSuccess("Full installation complete!");
+                    MessageBox.Show("All tools and runtimes installed successfully!\nYour system is fully configured!", "Success", 
+                        MessageBoxButton.OK, MessageBoxImage.Information);
+                });
             }
         }
 
-        private void CustomInstallButton_Click(object sender, RoutedEventArgs e)
+        private async void InstallGPUDrivers_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Custom selection dialog coming soon!", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
+            if (_toolInstaller == null) return;
+            await ExecuteSafe(async () =>
+            {
+                _logger.LogInfo("Starting GPU driver installation...");
+                await _toolInstaller.InstallGPUDrivers();
+                _logger.LogSuccess("GPU driver installation complete!");
+            });
         }
 
-        private async void OptimizeButton_Click(object sender, RoutedEventArgs e)
+        private async void InstallRuntimes_Click(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                var result = MessageBox.Show(
-                    "This will apply Windows optimizations.\n\nA system restore point will be created first.\n\nContinue?",
-                    "Apply Optimizations",
-                    MessageBoxButton.YesNo,
-                    MessageBoxImage.Question);
+            if (_runtimeInstaller == null) return;
 
-                if (result == MessageBoxResult.Yes)
+            var result = MessageBox.Show(
+                "This will install 30+ runtimes including:\n\n" +
+                "• VC++ Redistributables (2005-2022)\n" +
+                "• .NET Framework (3.5-4.8.1)\n" +
+                "• .NET Runtimes (5.0-8.0)\n" +
+                "• DirectX, XNA, OpenAL\n" +
+                "• Java 8 & 21\n\n" +
+                "This may take 30-60 minutes.\nContinue?",
+                "Install All Runtimes", MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+            if (result == MessageBoxResult.Yes)
+            {
+                await ExecuteSafe(async () =>
                 {
-                    _logger.LogInfo("Starting Windows optimization...");
-                    await _optimizer.ApplyAllOptimizations();
-                    _logger.LogSuccess("Optimizations applied successfully!");
-                    MessageBox.Show("Optimizations have been applied!\n\nA restart is recommended.",
+                    _logger.LogInfo("Starting All-in-One runtimes installation...");
+                    await _runtimeInstaller.InstallAllRuntimes();
+                    _logger.LogSuccess("All runtimes installed successfully!");
+                    MessageBox.Show("All runtimes installed!\nYour system is now fully compatible with all applications and games!", 
                         "Success", MessageBoxButton.OK, MessageBoxImage.Information);
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Optimization error: {ex.Message}");
-                MessageBox.Show($"Error:\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                });
             }
         }
 
-        private async void AdvancedOptimizeButton_Click(object sender, RoutedEventArgs e)
+        // Custom Selection Handlers
+        private void SelectAll_Click(object sender, RoutedEventArgs e)
         {
-            try
+            foreach (var item in _toolCheckBoxes)
             {
-                var result = MessageBox.Show(
-                    "This will run Chris Titus Tech's advanced optimization script.\n\nThis makes significant system changes.\n\nContinue?",
-                    "Advanced Optimization",
-                    MessageBoxButton.YesNo,
-                    MessageBoxImage.Warning);
+                if (item.CheckBox != null)
+                    item.CheckBox.IsChecked = true;
+            }
+            _logger.LogInfo("All tools selected");
+        }
 
-                if (result == MessageBoxResult.Yes)
+        private void DeselectAll_Click(object sender, RoutedEventArgs e)
+        {
+            foreach (var item in _toolCheckBoxes)
+            {
+                if (item.CheckBox != null)
+                    item.CheckBox.IsChecked = false;
+            }
+            _logger.LogInfo("All tools deselected");
+        }
+
+        private void SelectEssentials_Click(object sender, RoutedEventArgs e)
+        {
+            foreach (var item in _toolCheckBoxes)
+            {
+                if (item.CheckBox != null && item.Tool != null)
+                    item.CheckBox.IsChecked = item.Tool.Essential;
+            }
+            _logger.LogInfo("Essential tools selected");
+        }
+
+        private async void InstallSelected_Click(object sender, RoutedEventArgs e)
+        {
+            if (_toolInstaller == null) return;
+
+            var selectedTools = _toolCheckBoxes
+                .Where(t => t.CheckBox?.IsChecked == true && t.Tool != null)
+                .Select(t => t.Tool!)
+                .ToList();
+
+            if (!selectedTools.Any())
+            {
+                MessageBox.Show("Please select at least one tool to install.", 
+                    "No Selection", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            var result = MessageBox.Show(
+                $"Install {selectedTools.Count} selected tools?\nThis may take some time.",
+                "Confirm", MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+            if (result == MessageBoxResult.Yes)
+            {
+                await ExecuteSafe(async () =>
                 {
-                    _logger.LogInfo("Starting advanced optimization (CTT)...");
-                    await _optimizer.RunChrisTitusScript();
-                    _logger.LogSuccess("Advanced optimization completed!");
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Advanced optimization error: {ex.Message}");
-                MessageBox.Show($"Error:\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    _logger.LogInfo($"Installing {selectedTools.Count} selected tools...");
+                    await _toolInstaller.InstallCustomTools(selectedTools);
+                    _logger.LogSuccess("Selected tools installation complete!");
+                    MessageBox.Show("Selected tools installed successfully!", "Success", 
+                        MessageBoxButton.OK, MessageBoxImage.Information);
+                });
             }
         }
 
-        private async void ActivateWindowsButton_Click(object sender, RoutedEventArgs e)
+        // Browser Handlers
+        private async void BackupBrave_Click(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                var result = MessageBox.Show(
-                    "This will activate Windows using Microsoft Activation Scripts.\n\nThis is for users with valid licenses only.\n\nContinue?",
-                    "Activate Windows",
-                    MessageBoxButton.YesNo,
-                    MessageBoxImage.Question);
+            if (_browserBackup == null) return;
 
-                if (result == MessageBoxResult.Yes)
+            var dialog = new Microsoft.Win32.SaveFileDialog
+            {
+                FileName = $"BraveBackup_{DateTime.Now:yyyyMMdd_HHmmss}",
+                DefaultExt = ".zip",
+                Filter = "ZIP files (*.zip)|*.zip"
+            };
+
+            if (dialog.ShowDialog() == true)
+            {
+                await ExecuteSafe(async () =>
+                {
+                    _logger.LogInfo("Starting Brave profile backup...");
+                    var result = await _browserBackup.BackupBraveProfile(dialog.FileName);
+                    
+                    if (result.Success)
+                    {
+                        _logger.LogSuccess($"Backup complete! Size: {result.SizeInMB:F2} MB");
+                        MessageBox.Show($"Backup successful!\nLocation: {result.BackupPath}", 
+                            "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
+                    else
+                    {
+                        throw new Exception(result.ErrorMessage);
+                    }
+                });
+            }
+        }
+
+        private async void RestoreBrave_Click(object sender, RoutedEventArgs e)
+        {
+            if (_browserBackup == null) return;
+
+            var dialog = new Microsoft.Win32.OpenFileDialog
+            {
+                DefaultExt = ".zip",
+                Filter = "ZIP files (*.zip)|*.zip"
+            };
+
+            if (dialog.ShowDialog() == true)
+            {
+                await ExecuteSafe(async () =>
+                {
+                    _logger.LogInfo("Starting Brave profile restore...");
+                    var result = await _browserBackup.RestoreBraveProfile(dialog.FileName);
+                    
+                    if (result.Success)
+                    {
+                        _logger.LogSuccess("Restore complete!");
+                        MessageBox.Show("Profile restored successfully!", "Success", 
+                            MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
+                    else
+                    {
+                        throw new Exception(result.ErrorMessage ?? "Restore failed");
+                    }
+                });
+            }
+        }
+
+        private async void SetBraveDefault_Click(object sender, RoutedEventArgs e)
+        {
+            await ExecuteSafe(async () =>
+            {
+                _logger.LogInfo("Setting Brave as default browser...");
+                await Task.Run(() =>
+                {
+                    System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+                    {
+                        FileName = "ms-settings:defaultapps",
+                        UseShellExecute = true
+                    });
+                });
+                _logger.LogSuccess("Please select Brave in the settings window.");
+                MessageBox.Show("Please select Brave as default in the Settings window that opened.", 
+                    "Action Required", MessageBoxButton.OK, MessageBoxImage.Information);
+            });
+        }
+
+        // Windows Handlers
+        private async void OptimizeWindows_Click(object sender, RoutedEventArgs e)
+        {
+            if (_windowsOptimizer == null) return;
+
+            // Open custom optimization window
+            var optimizationWindow = new Views.OptimizationWindow();
+            optimizationWindow.ShowDialog();
+
+            if (optimizationWindow.WasApplied)
+            {
+                var settings = optimizationWindow.Settings;
+                
+                await ExecuteSafe(async () =>
+                {
+                    _logger.LogInfo("Applying selected Windows optimizations...");
+                    await _windowsOptimizer.ApplyCustomOptimizations(settings);
+                    _logger.LogSuccess("Windows optimizations complete!");
+                    MessageBox.Show("Selected optimizations applied successfully!", "Success", 
+                        MessageBoxButton.OK, MessageBoxImage.Information);
+                });
+            }
+        }
+
+        private async void ActivateWindows_Click(object sender, RoutedEventArgs e)
+        {
+            if (_windowsActivation == null) return;
+
+            var result = MessageBox.Show(
+                "This will attempt to activate Windows.\nUse only if you have a valid license.\nContinue?",
+                "Warning", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+
+            if (result == MessageBoxResult.Yes)
+            {
+                await ExecuteSafe(async () =>
                 {
                     _logger.LogInfo("Starting Windows activation...");
-                    await _activation.ActivateWindowsAutomatic();
-                    _logger.LogSuccess("Windows activation process completed!");
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Activation error: {ex.Message}");
-                MessageBox.Show($"Error:\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    await _windowsActivation.ActivateWindowsAutomatic();
+                    _logger.LogSuccess("Activation process complete!");
+                    MessageBox.Show("Activation process completed!", "Success", 
+                        MessageBoxButton.OK, MessageBoxImage.Information);
+                });
             }
         }
 
-        private async void CheckActivationButton_Click(object sender, RoutedEventArgs e)
+        // Error Handling Wrapper
+        private async Task ExecuteSafe(Func<Task> action)
         {
             try
             {
-                _logger.LogInfo("Checking Windows activation status...");
-                var status = await _activation.CheckWindowsActivationStatus();
-                
-                var message = status.IsActivated
-                    ? $"Windows is activated!\n\nLicense: {status.LicenseType}"
-                    : "Windows is not activated.";
-
-                MessageBox.Show(message, "Activation Status", MessageBoxButton.OK,
-                    status.IsActivated ? MessageBoxImage.Information : MessageBoxImage.Warning);
+                await action();
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                _logger.LogError($"Access denied: {ex.Message}");
+                MessageBox.Show("This operation requires administrator privileges.\nPlease run as administrator.", 
+                    "Access Denied", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            catch (System.Net.Http.HttpRequestException ex)
+            {
+                _logger.LogError($"Network error: {ex.Message}");
+                MessageBox.Show("Network error. Please check your internet connection.", 
+                    "Network Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            catch (TimeoutException ex)
+            {
+                _logger.LogError($"Operation timed out: {ex.Message}");
+                MessageBox.Show("Operation timed out. Please try again.", 
+                    "Timeout", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error checking activation: {ex.Message}");
-                MessageBox.Show($"Error:\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                _logger.LogError($"Error: {ex.Message}");
+                MessageBox.Show($"An error occurred:\n{ex.Message}", 
+                    "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
-
-        private void ClearLogButton_Click(object sender, RoutedEventArgs e)
-        {
-            LogTextBox.Clear();
-            _logger.LogInfo("Log cleared");
-        }
-
-        private void ExportLogButton_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                var dialog = new Microsoft.Win32.SaveFileDialog
-                {
-                    FileName = $"WindowsSetup_Log_{DateTime.Now:yyyy-MM-dd_HHmmss}",
-                    DefaultExt = ".txt",
-                    Filter = "Text files (*.txt)|*.txt"
-                };
-
-                if (dialog.ShowDialog() == true)
-                {
-                    File.WriteAllText(dialog.FileName, LogTextBox.Text);
-                    _logger.LogSuccess($"Log exported to: {dialog.FileName}");
-                    MessageBox.Show($"Log exported successfully!\n\n{dialog.FileName}", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error exporting log:\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
-    }
-
-    public enum LogLevel
-    {
-        Info,
-        Success,
-        Warning,
-        Error
     }
 }
-

@@ -4,16 +4,16 @@
 [Setup]
 AppName=Windows Post-Format Setup Tool
 AppVersion=1.0.0
-AppPublisher=Your Name
-AppPublisherURL=https://github.com/yourusername/windows-post-format-setup
-AppSupportURL=https://github.com/yourusername/windows-post-format-setup/issues
-AppUpdatesURL=https://github.com/yourusername/windows-post-format-setup/releases
+AppPublisher=grilojr09br
+AppPublisherURL=https://github.com/grilojr09br/Post-format-tools
+AppSupportURL=https://github.com/grilojr09br/Post-format-tools/issues
+AppUpdatesURL=https://github.com/grilojr09br/Post-format-tools/releases
 DefaultDirName={autopf}\WindowsPostFormatSetup
 DefaultGroupName=Windows Setup Tool
 AllowNoIcons=yes
 LicenseFile=LICENSE
-OutputDir=output
-OutputBaseFilename=WindowsPostFormatSetup_v1.0.0
+OutputDir=Release
+OutputBaseFilename=WindowsSetup-Installer
 SetupIconFile=assets\icon.ico
 Compression=lzma2/max
 SolidCompression=yes
@@ -24,9 +24,9 @@ ArchitecturesInstallIn64BitMode=x64compatible
 UninstallDisplayIcon={app}\WindowsSetup.exe
 UninstallDisplayName=Windows Post-Format Setup Tool
 VersionInfoVersion=1.0.0.0
-VersionInfoCompany=Your Company
+VersionInfoCompany=grilojr09br
 VersionInfoDescription=Windows Post-Format Setup Tool Installer
-VersionInfoCopyright=Copyright (C) 2024
+VersionInfoCopyright=Copyright (C) 2025
 WizardStyle=modern
 DisableProgramGroupPage=yes
 DisableWelcomePage=no
@@ -37,11 +37,10 @@ Name: "brazilianportuguese"; MessagesFile: "compiler:Languages\BrazilianPortugue
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
-Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked; OnlyBelowVersion: 6.1; Check: not IsAdminInstallMode
 
 [Files]
-Source: "src\WindowsSetup.App\bin\Release\net8.0-windows\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
-; NOTE: Don't use "Flags: ignoreversion" on any shared system files
+Source: "Release\WindowsSetup.exe"; DestDir: "{app}"; Flags: ignoreversion
+; Note: WindowsSetup.exe is self-contained, no DLLs needed
 
 [Icons]
 Name: "{group}\Windows Setup Tool"; Filename: "{app}\WindowsSetup.exe"
@@ -53,10 +52,7 @@ Filename: "{app}\WindowsSetup.exe"; Description: "{cm:LaunchProgram,Windows Setu
 
 [Code]
 function IsDotNetInstalled(): Boolean;
-var
-  ResultCode: Integer;
 begin
-  // Check if .NET 8 Runtime is installed
   Result := RegKeyExists(HKLM, 'SOFTWARE\dotnet\Setup\InstalledVersions\x64\sharedhost\8.0') or
             RegKeyExists(HKLM, 'SOFTWARE\WOW6432Node\dotnet\Setup\InstalledVersions\x64\sharedhost\8.0');
 end;
@@ -81,5 +77,4 @@ begin
 end;
 
 [Messages]
-WelcomeLabel2=This will install [name/ver] on your computer.%n%nThis tool helps automate Windows post-format setup by:%n%n• Backing up and restoring browser profiles%n• Installing development tools automatically%n• Optimizing Windows for better performance%n• Activating Windows%n%nIt is recommended that you close all other applications before continuing.
-
+WelcomeLabel2=This will install [name/ver] on your computer.%n%nThis tool helps automate Windows post-format setup by:%n%n• Backing up and restoring browser profiles%n• Installing 44+ development tools%n• Optimizing Windows for performance%n• GPU driver detection and installation%n• Activating Windows%n%nIt is recommended that you close all other applications before continuing.

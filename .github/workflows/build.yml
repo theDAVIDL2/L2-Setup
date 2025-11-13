@@ -29,6 +29,62 @@ jobs:
     
     - name: Test
       run: dotnet test src/WindowsSetup.App/WindowsSetup.App.csproj --no-build --verbosity normal --configuration Release
+
+    - name: Publish
+      run: |
+        dotnet publish src/WindowsSetup.App/WindowsSetup.App.csproj `
+          --configuration Release `
+          --runtime win-x64 `
+          --self-contained true `
+          --output Release `
+          /p:PublishSingleFile=true `
+          /p:IncludeNativeLibrariesForSelfExtract=true
+
+    - name: Upload Build Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: WindowsSetup-Build
+        path: Release/WindowsSetup.exe
+
+  release:
+    needs: build
+    runs-on: windows-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Download Build Artifact
+      uses: actions/download-artifact@v3
+      with:
+        name: WindowsSetup-Build
+        path: Release
+
+    - name: Setup Inno Setup
+      run: |
+        choco install innosetup -y
+
+    - name: Create Installer
+      run: |
+        & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" setup.iss
+
+    - name: Get Version
+      id: version
+      run: |
+        $version = "${{ github.ref_name }}"
+        echo "VERSION=$version" >> $env:GITHUB_OUTPUT
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          Output/WindowsPostFormatSetup*.exe
+        draft: false
+        prerelease: false
+        generate_release_notes: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       continue-on-error: true
     
     - name: Publish

@@ -153,3 +153,5 @@ Cloudflare_WARP_*.msi
 setup-lightshot.exe
 AdsPower-*.exe
 
+RELEASE_GUIDE.md
+release-config.json

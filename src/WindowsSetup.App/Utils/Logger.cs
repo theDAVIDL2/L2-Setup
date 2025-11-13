@@ -2,34 +2,41 @@ using System;
 
 namespace WindowsSetup.App.Utils
 {
+    public enum LogLevel
+    {
+        Info,
+        Success,
+        Warning,
+        Error
+    }
+
     public class Logger
     {
-        private readonly Action<string, LogLevel> _logAction;
+        private readonly Action<string> _logCallback;
 
-        public Logger(Action<string, LogLevel> logAction)
+        public Logger(Action<string> logCallback)
         {
-            _logAction = logAction;
+            _logCallback = logCallback;
         }
 
         public void LogInfo(string message)
         {
-            _logAction?.Invoke($"[INFO] {message}", LogLevel.Info);
+            _logCallback?.Invoke($"[INFO] {message}");
         }
 
         public void LogSuccess(string message)
         {
-            _logAction?.Invoke($"[SUCCESS] {message}", LogLevel.Success);
+            _logCallback?.Invoke($"✅ [SUCCESS] {message}");
         }
 
         public void LogWarning(string message)
         {
-            _logAction?.Invoke($"[WARNING] {message}", LogLevel.Warning);
+            _logCallback?.Invoke($"⚠️  [WARNING] {message}");
         }
 
         public void LogError(string message)
         {
-            _logAction?.Invoke($"[ERROR] {message}", LogLevel.Error);
+            _logCallback?.Invoke($"❌ [ERROR] {message}");
         }
     }
 }
-
