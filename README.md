@@ -15,7 +15,9 @@
 
 KNOWN ISSUES: 
 • Installer isn't being capable of downloading NET 8 runtime, so the production exe is being attached to the releases
+
 • Process Hacker 2 installation process isn't working
+
 • Only Brave is suported for the browsers tab for now
 
 </div>
