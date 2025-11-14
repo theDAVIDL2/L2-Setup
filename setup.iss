@@ -1,8 +1,6 @@
-; Windows Post-Format Setup Tool - Inno Setup Script
-; Requires Inno Setup 6.x or later
-
+; Note: This URL is for the fallback download method if Winget is not available.
 #define DotNetUrl "https://download.visualstudio.microsoft.com/download/pr/d8cf1fe3-21c2-4baf-988f-f0152996135e/0c00b94713ee93e7ad5b4f82e2b86607/windowsdesktop-runtime-8.0.2-win-x64.exe"
-#define DotNetFileName "dotnet8-runtime.exe"
+#define DotNetFileName "dotnet8-desktop-runtime.exe"
 
 [Setup]
 AppName=L2 Setup
@@ -57,105 +55,103 @@ Filename: "{app}\L2Setup.exe"; Description: "{cm:LaunchProgram,L2 Setup}"; Flags
 [Code]
 var
   DotNetInstallNeeded: Boolean;
-  DotNetDownloadPage: TDownloadWizardPage;
 
-function IsDotNetInstalled(): Boolean;
+function IsDotNetDesktopRuntimeInstalled(): Boolean;
 var
-  Success: Boolean;
-  ResultCode: Integer;
+  Version: string;
 begin
-  // Check via PowerShell for .NET 8 Runtime
-  Success := Exec('powershell.exe', 
-    '-NoProfile -Command "if (Test-Path ''C:\Program Files\dotnet\shared\Microsoft.WindowsDesktop.App\8.*'') { exit 0 } else { exit 1 }"',
-    '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
-  
-  Result := Success and (ResultCode = 0);
+  // Check for .NET Desktop Runtime 8.x (64-bit)
+  if RegQueryStringValue(HKLM64, 'SOFTWARE\dotnet\Setup\InstalledVersions\x64\sharedfx\Microsoft.WindowsDesktop.App', '8.0', Version) then
+  begin
+    Log('.NET 8 Desktop Runtime (x64) found. Version: ' + Version);
+    Result := True;
+    Exit;
+  end;
+  Log('.NET 8 Desktop Runtime (x64) not found in registry.');
+  Result := False;
 end;
 
 procedure InitializeWizard();
 begin
-  DotNetInstallNeeded := not IsDotNetInstalled();
-  
+  DotNetInstallNeeded := not IsDotNetDesktopRuntimeInstalled();
   if DotNetInstallNeeded then
   begin
-    // Create download page
-    DotNetDownloadPage := CreateDownloadPage(SetupMessage(msgWizardPreparing), SetupMessage(msgPreparingDesc), nil);
+    Log('.NET 8 Desktop Runtime is not installed. The setup will attempt to install it.');
   end;
+end;
+
+function InstallDotNetWithWinget(var ResultCode: Integer): Boolean;
+var
+  WingetCmd: String;
+begin
+  Log('Attempting to install .NET 8 Desktop Runtime via Winget...');
+  WizardForm.StatusLabel.Caption := 'Attempting to install .NET 8 via Winget...';
+  WizardForm.ProgressGauge.Style := npbstMarquee;
+  
+  WingetCmd := 'install --id Microsoft.DotNet.DesktopRuntime.8 --silent --accept-package-agreements --accept-source-agreements';
+  
+  Result := Exec('winget', WingetCmd, '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+end;
+
+function InstallDotNetManually(var ResultCode: Integer): Boolean;
+var
+  PowerShellCmd: String;
+  InstallerPath: String;
+begin
+  Log('Winget not available or failed. Falling back to manual download...');
+  WizardForm.StatusLabel.Caption := 'Downloading .NET 8 Desktop Runtime...';
+  
+  InstallerPath := ExpandConstant('{tmp}\{#DotNetFileName}');
+  PowerShellCmd := 'Invoke-WebRequest -Uri "{#DotNetUrl}" -OutFile "' + InstallerPath + '"';
+
+  // Download using PowerShell
+  if not Exec('powershell.exe', '-NoProfile -Command "' + PowerShellCmd + '"', '', SW_HIDE, ewWaitUntilTerminated, ResultCode) or (ResultCode <> 0) then
+  begin
+    Log('PowerShell download failed. Exit code: ' + IntToStr(ResultCode));
+    Result := False;
+    Exit;
+  end;
+
+  Log('Download complete. Starting installer...');
+  WizardForm.StatusLabel.Caption := 'Installing .NET 8 Desktop Runtime...';
+
+  // Install the downloaded file
+  Result := Exec(InstallerPath, '/install /quiet /norestart', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
 end;
 
 function NextButtonClick(CurPageID: Integer): Boolean;
 var
   ResultCode: Integer;
-  DotNetInstaller: String;
 begin
   Result := True;
-
   if (CurPageID = wpReady) and DotNetInstallNeeded then
   begin
-    DotNetDownloadPage.Clear;
-    DotNetDownloadPage.Add('{#DotNetUrl}', '{#DotNetFileName}', '');
-    DotNetDownloadPage.Show;
-    
-    try
-      try
-        DotNetDownloadPage.Download;
-        Result := True;
-      except
-        if DotNetDownloadPage.AbortedByUser then
-          Log('Download aborted by user.')
-        else
-          SuppressibleMsgBox(AddPeriod(GetExceptionMessage), mbCriticalError, MB_OK, IDOK);
-        Result := False;
-      end;
-    finally
-      DotNetDownloadPage.Hide;
-    end;
-
-    if Result then
+    // Try Winget first
+    if InstallDotNetWithWinget(ResultCode) and (ResultCode = 0) then
     begin
-      // Install .NET 8 Runtime
-      DotNetInstaller := ExpandConstant('{tmp}\{#DotNetFileName}');
-      
-      if FileExists(DotNetInstaller) then
+      Log('.NET 8 Desktop Runtime installed successfully via Winget.');
+      DotNetInstallNeeded := False;
+    end
+    else
+    begin
+      // If Winget fails (doesn't exist or returns an error), fall back to manual install
+      if not InstallDotNetManually(ResultCode) or ((ResultCode <> 0) and (ResultCode <> 3010)) then
       begin
-        MsgBox('.NET 8 Runtime will now be installed.' + #13#10 + 
-               'This is required for the application to run.' + #13#10#13#10 +
-               'Please wait...', mbInformation, MB_OK);
-        
-        if Exec(DotNetInstaller, '/install /quiet /norestart', '', SW_SHOW, ewWaitUntilTerminated, ResultCode) then
+        if MsgBox('Failed to automatically install the .NET 8 Desktop Runtime.' + #13#10 + #13#10 +
+               'Do you want to open the download page to install it manually?', mbError, MB_YESNO) = IDYES then
         begin
-          if ResultCode = 0 then
-          begin
-            MsgBox('.NET 8 Runtime installed successfully!', mbInformation, MB_OK);
-            DotNetInstallNeeded := False;
-          end
-          else if ResultCode = 3010 then
-          begin
-            MsgBox('.NET 8 Runtime installed successfully!' + #13#10 + 
-                   'A system restart is recommended after installation completes.', mbInformation, MB_OK);
-            DotNetInstallNeeded := False;
-          end
-          else
-          begin
-            MsgBox('.NET 8 Runtime installation failed with code: ' + IntToStr(ResultCode) + #13#10 +
-                   'The application may not work correctly.', mbError, MB_OK);
-            Result := True; // Continue anyway
-          end;
-        end
-        else
-        begin
-          MsgBox('Failed to start .NET 8 Runtime installer.' + #13#10 +
-                 'The application may not work correctly.', mbError, MB_OK);
-          Result := True; // Continue anyway
+          ShellExec('open', 'https://dotnet.microsoft.com/download/dotnet/8.0', '', '', SW_SHOWNORMAL, ewNoWait, ResultCode);
         end;
+        Result := False; // Stop the installation
+      end
+      else
+      begin
+        Log('.NET 8 Desktop Runtime installed successfully via manual download. Exit code: ' + IntToStr(ResultCode));
+        DotNetInstallNeeded := False;
       end;
     end;
+    WizardForm.ProgressGauge.Style := npbstNormal;
   end;
-end;
-
-function PrepareToInstall(var NeedsRestart: Boolean): String;
-begin
-  Result := '';
 end;
 
 function UpdateReadyMemo(Space, NewLine, MemoUserInfoInfo, MemoDirInfo, MemoTypeInfo, MemoComponentsInfo, MemoGroupInfo, MemoTasksInfo: String): String;
@@ -163,17 +159,11 @@ var
   S: String;
 begin
   S := '';
-  
   if DotNetInstallNeeded then
-    S := S + '.NET 8 Runtime will be downloaded and installed automatically.' + NewLine + NewLine;
-    
+    S := S + 'The following dependency is required and will be installed automatically:' + NewLine +
+           '  - .NET 8 Desktop Runtime (x64)' + NewLine + NewLine;
   S := S + MemoDirInfo + NewLine + NewLine;
-  
   if MemoTasksInfo <> '' then
     S := S + MemoTasksInfo + NewLine + NewLine;
-    
   Result := S;
 end;
-
-[Messages]
-WelcomeLabel2=This will install [name/ver] on your computer.%n%nL2 Setup is an All-in-One tool that automates:%n%n• Browser profile backup/restore%n• 44+ development tools installation%n• 30+ runtimes (VC++, .NET, DirectX, Java)%n• Windows optimization (customizable)%n• GPU driver detection & installation%n• Windows activation%n%nIt is recommended that you close all other applications before continuing.

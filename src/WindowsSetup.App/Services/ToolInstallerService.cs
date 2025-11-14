@@ -115,7 +115,7 @@ namespace WindowsSetup.App.Services
                 new() { Name = "JDownloader 2", WingetId = "AppWork.JDownloader", Priority = 62 },
                 
                 // System Tools
-                new() { Name = "System Informer", Method = "direct", DirectUrl = "https://github.com/winsiderss/systeminformer/releases/download/v3.1.24274/systeminformer-3.1.24274-release-setup.exe", SilentArgs = "/VERYSILENT", Priority = 70 },
+                new() { Name = "System Informer (Process Hacker)", Method = "direct", DirectUrl = "https://github.com/winsiderss/systeminformer/releases/download/v3.0.34.6635/systeminformer-3.0.34.6635-setup.exe", SilentArgs = "/VERYSILENT", Priority = 70 },
                 
                 // Development SDKs & Tools (Release Guide Requirements)
                 new() { Name = ".NET 8 SDK", WingetId = "Microsoft.DotNet.SDK.8", Priority = 75 },
